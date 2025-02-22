@@ -4,12 +4,11 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-const port = process.env.REACT_APP_URL;
+const LoginAPI = process.env.REACT_APP_LOGIN_API;
 
 const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: "",
         email: "",
         password: "",
     });
@@ -23,7 +22,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const res = await axios.post(`${port}/login-user`, formData);
+            const res = await axios.post(`${LoginAPI}`, formData);
 
             console.log("Backend Response:", res.data);
 
@@ -80,15 +79,6 @@ const Login = () => {
                     <form onSubmit={handleSubmit}>
                         <input
                             onChange={handleInputChange}
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            required
-                            placeholder="Username"
-                            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                        />
-                        <input
-                            onChange={handleInputChange}
                             type="email"
                             name="email"
                             value={formData.email}
@@ -106,7 +96,7 @@ const Login = () => {
                             className="w-full px-4 py-2 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
 
-                        <button className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800">
+                        <button type="submit" className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800">
                             Login
                         </button>
                     </form>

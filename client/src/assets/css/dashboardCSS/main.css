@@ -52,7 +52,30 @@ body {
   font-family: var(--poppins);
   max-height: calc(100vh - 56px);
   overflow-y: auto;
+
+
+
 }
+
+/* Scrollbar width */
+#content main::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Scrollbar track */
+#content main::-webkit-scrollbar-track {
+  background: rgba(231, 229, 229, 0.64);
+  border-radius: 8px;
+}
+
+/* Scrollbar thumb */
+#content main::-webkit-scrollbar-thumb {
+  background: #2563eb; /* Equivalent to Tailwind's bg-blue-600 */
+  border-radius: 8px;
+}
+
+
+
 #content main .head-title {
   display: flex;
   align-items: center;

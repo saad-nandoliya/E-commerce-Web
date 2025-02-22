@@ -92,7 +92,7 @@ function NavIcon() {
               </div>
 
               <NavLink
-                to="/signup"
+                to="/login"
                 onClick={() => setIsProfileOpen(false)}
                 className="block mt-4 w-full"
               >

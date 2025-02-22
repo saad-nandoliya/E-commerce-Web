@@ -9,6 +9,7 @@ const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
 const registerNewUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        
 
         const hashPassword = await bcrypt.hash(password, 10);
 
@@ -36,7 +37,6 @@ const registerNewUser = async (req, res) => {
 const loginClientUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required!" });
         }
@@ -55,6 +55,7 @@ const loginClientUser = async (req, res) => {
             const user = result[0];
 
             const isPasswordValid = await bcrypt.compare(password, user.password);
+            console.log(isPasswordValid)
             if (!isPasswordValid) {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
@@ -64,7 +65,7 @@ const loginClientUser = async (req, res) => {
                 SECRET_KEY,
                 { expiresIn: "1h" }
             );
-
+            console.log(token)
             return res.status(200).json({
                 message: "Login successful",
                 token,

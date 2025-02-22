@@ -5,7 +5,7 @@ import "../../assets/css/dashboardCSS/main.css";
 
 const Hoc = () => {
 
-    const [sidebarHidden, setSidebarHidden] = useState(window.innerWidth < 768);
+    const [sidebarHidden, setSidebarHidden] = useState(window.innerWidth < 770);
     const [isDarkMode, setDarkMode] = useState(false);
 
     const toggleSidebar = () => {
@@ -19,7 +19,7 @@ const Hoc = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            setSidebarHidden(window.innerWidth < 768);
+            setSidebarHidden(window.innerWidth < 770);
         };
 
         window.addEventListener("resize", handleResize);
@@ -32,10 +32,10 @@ const Hoc = () => {
         <>
             <Sidebar isOpen={!sidebarHidden} />
             <Navbar toggleSidebar={toggleSidebar} toggleDarkMode={toggleDarkMode} />
-         
-           
+
+
         </>
     )
 }
 
-export default Hoc
+export default Hoc

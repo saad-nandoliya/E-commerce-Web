@@ -1,7 +1,7 @@
 import React from 'react'
 import {NavLink} from "react-router-dom"
 
-const productCard = ({ image, title, price, onAddToCart }) => {
+const productCard = ({ id, image, name, price, onAddToCart }) => {
     return (
         <>
             <div
@@ -9,17 +9,17 @@ const productCard = ({ image, title, price, onAddToCart }) => {
                 className="w-[122px] h-[265px] md:w-[160px] rounded-lg p-3 flex flex-col items-center bg-white shadow-lg"
             >
 
-                <NavLink to="/productsdetail">
+                <NavLink to={`/productsdetail/${id}`}>
                     <img
-                        src={image}
-                        alt={title}
-                        className="w-[150px] h-[150px] object-contain rounded-md"
+                        src={`/uploads/${image}`}
+                        alt={name}
+                        className="w-[150px] h-[150px] object-cover rounded-md"
                     />
 
                 </NavLink>
 
                 <h2 className="mt-2 mb-2 font-medium text-center text-sm w-full truncate">
-                    {title}
+                    {name}
                 </h2>
 
                 <p className="text-gray-600 text-xs">${price}</p>

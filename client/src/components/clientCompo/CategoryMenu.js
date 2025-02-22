@@ -1,43 +1,66 @@
-import React from 'react'
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { FaBars } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+
+const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
 
 const CategoryMenu = () => {
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-    const categories = [
-        "Electronics",
-        "Shoes",
-        "Clothing",
-        "Accessories",
-        "Home & Kitchen",
-    ];
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
+  const fetchAllData = async () => {
+    try {
+      const res = await axios.get(GetCategoryAPI);
+      setCategories(res.data);
+    } catch (error) {
+      console.log("Error fetching categories:", error);
+    }
+  };
 
-    return (
-        <>
-            <div className="w-full md:w-1/5 p-4 md:sticky top-0">
-                <div className="flex justify-between items-center md:block">
-                    <h2 className="text-lg font-semibold hidden md:block">Categories</h2>
-                    <FaBars
-                        className="cursor-pointer md:hidden text-xl"
-                        onClick={() => setDropdownOpen(!isDropdownOpen)}
-                    />
-                </div>
+  const navigateProducts = (id) => {
+    navigate(`/categoryproduct/${id}`);
+  };
 
-                {/* Categories List */}
-                <ul className={`space-y-2 ${isDropdownOpen ? "block" : "hidden"} sm:min-h-screen h-full  lg:border-r md:block mt-4 `}>
-                    {categories.map((category, index) => (
-                        <li key={index} className="  py-2 px-3 border-b border-gray-300 cursor-pointer hover:bg-gray-200 rounded">
-                            {category}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+  return (
+    <div className="w-full md:w-1/5 p-4 md:sticky">
+      <div className="flex justify-between items-center md:block">
+        <div className="flex justify-between">
+          <h2 className="text-lg font-semibold hidden md:block">Categories</h2>
+          <NavLink to="/"> 
+            <i className="fa-solid fa-house text-xl"></i>
+          </NavLink>
+        </div>
 
-        </>
-    )
-}
+        <FaBars
+          className="cursor-pointer md:hidden text-xl"
+          onClick={() => setDropdownOpen(!isDropdownOpen)}
+        />
+      </div>
+
+      <ul
+        className={`space-y-2 ${
+          isDropdownOpen ? "block" : "hidden"
+        }  md:min-h-screen  h-full lg:border-r  md:block mt-4 `}
+      >
+        {categories.map((category) => (
+          <li
+            onClick={() => navigateProducts(category.id)}
+            key={category.id}
+            className="  py-2 px-3 border-b   border-gray-300 cursor-pointer hover:bg-gray-200 rounded"
+          >
+            <span> {category.title}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 export default CategoryMenu

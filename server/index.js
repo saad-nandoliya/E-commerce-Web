@@ -6,7 +6,10 @@ dotenv.config()
 
 const db = require("./connection/connection")
 const userLogin = require("./routes/loginRoute/userLoginRoute")
+const adminUser = require("./routes/loginRoute/adminLoginRoute")
 const product = require("./routes/pagesRoute/productPageRoute")
+const category = require("./routes/pagesRoute/categoryRoutePage")
+
 
 
 const app = express()
@@ -17,7 +20,9 @@ app.use(cors())
 app.use(express.json())
 app.use(bodyparser.json())
 app.use("/", userLogin)
+app.use("/", adminUser)
 app.use("/", product)
+app.use("/", category)
 
 
 

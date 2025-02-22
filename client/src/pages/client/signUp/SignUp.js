@@ -5,7 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
 
-const port = process.env.REACT_APP_URL ;
+const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API ;
+const GoogleRegisterAPI = process.env.REACT_APP_GOOGLE_REGISTER_API ;
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 const SignUp = () => {
@@ -24,7 +25,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${port}/register-new-user`, userData);
+      const res = await axios.post(`${UserRegisterAPI}`, userData);
 
       const userPayload = {
         username: userData.username,
@@ -61,7 +62,7 @@ const SignUp = () => {
           picture: data.picture,
         };
 
-        const res = await axios.post(`${port}/google-signup`, userPayload);
+        const res = await axios.post(`${GoogleRegisterAPI}`, userPayload);
 
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userInfo", JSON.stringify(userPayload)); // Add this line

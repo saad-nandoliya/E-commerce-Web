@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import "../../assets/css/dashboardCSS/main.css";
-import Hoc from "./Hoc";
+// import React, { useState, useEffect } from "react";
+import Hoc from "../../../components/dashboardCompo/Hoc";
+import "../../../assets/css/dashboardCSS/main.css";
 
 const Dashboard = () => {
   return (
@@ -74,7 +74,7 @@ const Dashboard = () => {
                   <tr>
                     <td>
                       <img
-                        src={require("../../assets/images/shopping.png")}
+                        src={require("../../../assets/images/shopping.png")}
                         alt="user"
                       />
                       <p>John Doe</p>
@@ -87,7 +87,7 @@ const Dashboard = () => {
                   <tr>
                     <td>
                       <img
-                        src={require("../../assets/images/shopping.png")}
+                        src={require("../../../assets/images/shopping.png")}
                         alt="user"
                       />
                       <p>John Doe</p>
@@ -100,7 +100,7 @@ const Dashboard = () => {
                   <tr>
                     <td>
                       <img
-                        src={require("../../assets/images/shopping.png")}
+                        src={require("../../../assets/images/shopping.png")}
                         alt="user"
                       />
                       <p>John Doe</p>
@@ -113,7 +113,7 @@ const Dashboard = () => {
                   <tr>
                     <td>
                       <img
-                        src={require("../../assets/images/shopping.png")}
+                        src={require("../../../assets/images/shopping.png")}
                         alt="user"
                       />
                       <p>John Doe</p>
@@ -126,7 +126,7 @@ const Dashboard = () => {
                   <tr>
                     <td>
                       <img
-                        src={require("../../assets/images/shopping.png")}
+                        src={require("../../../assets/images/shopping.png")}
                         alt="user"
                       />
                       <p>John Doe</p>

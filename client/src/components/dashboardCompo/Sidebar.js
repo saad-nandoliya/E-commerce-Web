@@ -19,22 +19,22 @@ const Sidebar = ({ isOpen }) => {
               <span className="text">Dashboard</span>
             </NavLink>
           </li>
-          <li className={location.pathname === "/admin/products" ? "active" : ""}>
-            <NavLink to="/admin/products">
+          <li className={location.pathname === "/admin/allproducts" ? "active" : ""}>
+            <NavLink to="/admin/allproducts">
               <i className="bx bxs-shopping-bag-alt"></i>
               <span className="text">Product</span>
             </NavLink>
           </li>
-          <li className={location.pathname === "/admin/dashboard2" ? "active" : ""}>
-            <NavLink to="/admin/dashboard">
-              <i className="bx bxs-shopping-bag-alt"></i>
-              <span className="text">Product</span>
+          <li className={location.pathname === "/admin/allcategories" ? "active" : ""}>
+            <NavLink to="/admin/allcategories">
+              <i className='bx bxs-category'></i>
+              <span className='text'>Categories</span>
             </NavLink>
           </li>
-          <li className={location.pathname === "/admin/dashboard3" ? "active" : ""}>
-            <NavLink to="/admin/dashboard">
-              <i className="bx bxs-shopping-bag-alt"></i>
-              <span className="text">Product</span>
+          <li className={location.pathname === "/admin/alladminusers" ? "active" : ""}>
+            <NavLink to="/admin/alladminusers">
+            <i className='bx bxs-user-badge'></i>  
+              <span className="text">Admin Users</span>
             </NavLink>
           </li>
         </ul>
@@ -58,4 +58,4 @@ const Sidebar = ({ isOpen }) => {
   );
 };
 
-export default Sidebar;
+export default Sidebar;

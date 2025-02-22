@@ -11,24 +11,28 @@ import OrderTracking from "../../components/clientCompo/orderTrackingPage";
 import CategoryProduct from "../../components/clientCompo/categoryProduct";
 import ProductDetail from "../../components/clientCompo/productsDetail";
 import AllProducts from "../../components/clientCompo/allProduct";
+import ScrollToTop from "../../components/ScrollToTop";
 
 const HomeRoutes = () => {
     return (
-        <Routes>
-            <Route path="/" element={<Layout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/categoryproduct" element={<CategoryProduct />} />
-                <Route path="/productsdetail" element={<ProductDetail />} />
-                <Route path="/allproduct" element={<AllProducts />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/ordertrack" element={<OrderTracking />} />
+        <>
+            <ScrollToTop />
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/categoryproduct/:category_id" element={<CategoryProduct />} />
+                    <Route path="/productsdetail/:id" element={<ProductDetail />} />
+                    <Route path="/allproduct" element={<AllProducts />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/ordertrack" element={<OrderTracking />} />
 
-                <Route path="*" element={<NotFound />} />
-            </Route>
-        </Routes>
+                    <Route path="*" element={<NotFound />} />
+                </Route>
+            </Routes>
+        </>
     )
 }
 
