@@ -5,8 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
 
-const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API ;
-const GoogleRegisterAPI = process.env.REACT_APP_GOOGLE_REGISTER_API ;
+const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API;
+const GoogleRegisterAPI = process.env.REACT_APP_GOOGLE_REGISTER_API;
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 const SignUp = () => {
@@ -30,19 +30,26 @@ const SignUp = () => {
       const userPayload = {
         username: userData.username,
         email: userData.email,
-        picture: "", 
+        picture: "",
       };
 
       // LocalStorage me user info store karo
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userInfo", JSON.stringify(userPayload));
 
-      toast.success("Signup Successful!", { autoClose: 3000 });
-      navigate("/");
+      setTimeout(() => {
+        if (res.status === 201) {
+          toast.success(res.data.message, { autoClose: 2000 });
+        }
+      }, 100)
+      navigate("/login");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Signup Failed!", {
-        autoClose: 3000,
-      });
+      if (error.response.status === 400) {
+        toast.error(error.response.data.message);
+      } else {
+        console.error("Error adding user:", error);
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -66,11 +73,17 @@ const SignUp = () => {
 
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userInfo", JSON.stringify(userPayload)); // Add this line
-        toast.success("Google Signup Successful!", { autoClose: 3000 });
+        if (res.status === 201) {
+          toast.success(res.data.message);
+        }
         navigate("/");
       } catch (error) {
-        console.error("Google Signup Error:", error);
-        toast.error("Google Signup Failed!", { autoClose: 3000 });
+        if (error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          console.error("Error adding user:", error);
+          toast.error("Something went wrong. Please try again.");
+        }
       }
     },
     onError: () => toast.error("Google Login Failed!", { autoClose: 3000 }),
@@ -153,4 +166,4 @@ const SignUp = () => {
     </GoogleOAuthProvider>
   );
 };
-export default SignUp;
+export default SignUp;

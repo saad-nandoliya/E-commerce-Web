@@ -7,26 +7,35 @@ const addAdminUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        if (!username || !password) {
+        if (!username || !email || !password) {
             return res
                 .status(400)
-                .json({ message: "Username and email and password are required." });
+                .json({ message: "Username, email, and password are required." });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const sqlQuery = "INSERT INTO `admin_users` (username, email, password) VALUES (?, ?, ?)";
-        const data = [username, email, hashedPassword];
-
-        db.query(sqlQuery, data, (err) => {
+        const checkEmail = "SELECT * FROM `admin_users` WHERE username = ? OR email = ?"
+        db.query(checkEmail, [username,email], async (err, result) => {
             if (err) {
                 console.error("Database error:", err.message);
-                return res.status(500).json({
-                    message: "Database query error. Please try again later.",
-                });
+                return res.status(500).json({ message: "Database error. Try again later." });
             }
 
-            return res.status(201).json({
-                message: "User added successfully.",
+            if (result.length > 0) {
+                return res.status(400).json({ message: "Username Or Email already exists. Try another one!" });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const sqlQuery = "INSERT INTO `admin_users` (username, email, password) VALUES (?, ?, ?)";
+            const data = [username, email, hashedPassword];
+
+            db.query(sqlQuery, data, (err) => {
+                if (err) {
+                    console.error("Database error:", err.message);
+                    return res.status(500).json({ message: "Database query error. Please try again later." });
+                }
+
+                return res.status(201).json({ message: "Admin User added successfully." });
             });
         });
     } catch (error) {
@@ -34,6 +43,7 @@ const addAdminUser = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 // ===================================== (bcrypt.compare) =====================================
 

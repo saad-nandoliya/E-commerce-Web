@@ -1,16 +1,17 @@
 const multer = require("multer")
 const path = require("path")
+const fs = require("fs")
 
-
-const storage = multer.diskStorage({
+const getStorage = (folderName) => multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../../client/public/uploads"));
+        cb(null, path.join(__dirname, `../../client/public/uploads/${folderName}`));
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + file.originalname);
-    },
+        cb(null, Date.now() + "-" + file.originalname);
+    }
 });
 
-const location = multer({ storage: storage });
+const productLocation = multer({ storage: getStorage("productImage") });
+const categoryLocation = multer({ storage: getStorage("categoryImage") });
 
-module.exports = location;
+module.exports = {productLocation, categoryLocation};

@@ -14,6 +14,8 @@ const AddCategory = () => {
         title: "",
     });
 
+    console.log(category)
+
     const handleChange = (e) => {
         const { name, value, files } = e.target;
         if (name === "image") {

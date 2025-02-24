@@ -11,7 +11,7 @@ const productCard = ({ id, image, name, price, onAddToCart }) => {
 
                 <NavLink to={`/productsdetail/${id}`}>
                     <img
-                        src={`/uploads/${image}`}
+                        src={`/uploads/productImage/${image}`}
                         alt={name}
                         className="w-[150px] h-[150px] object-cover rounded-md"
                     />

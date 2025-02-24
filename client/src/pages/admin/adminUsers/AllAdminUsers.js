@@ -2,13 +2,18 @@ import { NavLink } from "react-router-dom";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import UserDeleteModal from "../../../components/Modal/DeleteModal"
 
 
 const getAdminUserAPI = process.env.REACT_APP_GET_ADMIN_USER_API
+const deleteAdminUserAPI = process.env.REACT_APP_DELETE_ADMIN_USER_API
 
 const AllAdminUsers = () => {
     const [adminUsersData, setAdminUsersData] = useState([])
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -20,6 +25,25 @@ const AllAdminUsers = () => {
             setAdminUsersData(res.data.results);
         } catch (error) {
             console.error("Error fetching data:", error);
+        }
+    };
+
+
+    const handleDelete = (id) => {
+        setSelectedUserId(id);
+        setModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await axios.delete(`${deleteAdminUserAPI}/${selectedUserId}`);
+            toast.success("User deleted successfully!");
+            setModalOpen(false);
+            setSelectedUserId(null);
+            fetchUsers();
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error("Failed to delete user. Please try again.");
         }
     };
 
@@ -44,7 +68,7 @@ const AllAdminUsers = () => {
                     <div className="overflow-y-auto max-h-[500px] border border-gray-300 rounded-lg shadow-md 
         [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[rgba(231,229,229,0.64)] [&::-webkit-scrollbar-thumb]:bg-blue-600 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-thumb]:rounded-lg">
                         <table
-                           className="min-w-full table-fixed"
+                            className="min-w-full table-fixed"
                         >
                             <thead className="sticky top-0 bg-gray-100 shadow-md z-10">
                                 <tr className="bg-gray-100 text-gray-700 uppercase text-sm">
@@ -56,21 +80,21 @@ const AllAdminUsers = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {adminUsersData.map((item) => (
+                                {adminUsersData.map((user) => (
                                     <tr
-                                        key={item.id}
+                                        key={user.id}
                                         className="border border-gray-300 odd:bg-[#EEEEEE] even:bg-[#F9FAFB] transition"
                                     >
-                                        <td className="px-4 py-3 text-center">{item.id}</td>
+                                        <td className="px-4 py-3 text-center">{user.id}</td>
                                         <td className="px-4 py-3 flex justify-center">
                                             <img
-                                                src={`/uploads/${item.image}`}
-                                                alt={item.username}
+                                                src={`/uploads/${user.image}`}
+                                                alt={user.username}
                                                 className="w-10 h-10 rounded-full border border-gray-300"
                                             />
                                         </td>
                                         <td className="px-4 py-3 text-center truncate max-w-[150px]">
-                                            {item.username}
+                                            {user.username}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <label className="relative inline-block w-8 h-4">
@@ -80,13 +104,13 @@ const AllAdminUsers = () => {
                                             </label>
                                         </td>
                                         <td className="text-center space-x-1">
-                                            {/* <NavLink to={`/admin/updatecategory/${item.id}`}> */}
-                                            <button className="px-2 py-1 border text-blue-600 rounded-md hover:bg-gray-100 transition duration-300">
-                                                <i className="fa-solid fa-pencil text-sm"></i>
-                                            </button>
-                                            {/* </NavLink> */}
+                                            <NavLink to={`/admin/updatecategory/${user.id}`}>
+                                                <button className="px-2 py-1 border text-blue-600 rounded-md hover:bg-gray-100 transition duration-300">
+                                                    <i className="fa-solid fa-pencil text-sm"></i>
+                                                </button>
+                                            </NavLink>
                                             <button
-                                                // onClick={() => handleDelete(item.id)}
+                                                onClick={() => handleDelete(user.id)}
                                                 className="px-2 py-1 text-red-600 rounded-md border hover:bg-gray-100 transition duration-300"
                                             >
                                                 <i className="fa-solid fa-trash text-sm"></i>
@@ -100,7 +124,12 @@ const AllAdminUsers = () => {
                 </main>
             </section>
 
-
+            <UserDeleteModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onConfirm={confirmDelete}
+                fieldName={"User"}
+            />
 
             <ToastContainer position="top-right" autoClose={2000} />
         </>

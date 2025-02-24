@@ -15,7 +15,6 @@ const ShowAllCategories = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
 
-    console.log(product)
 
     useEffect(() => {
         fetchAllData();
@@ -25,6 +24,7 @@ const ShowAllCategories = () => {
         try {
             const res = await axios.get(GetCategoryAPI);
             setProduct(res.data);
+            console.log(res.data)
         } catch (error) {
             console.log("Error fetching categories:", error);
         }
@@ -92,7 +92,7 @@ const ShowAllCategories = () => {
                                         <td className="px-4 py-3 text-center">{item.id}</td>
                                         <td className="px-4 py-3 flex justify-center">
                                             <img
-                                                src={`/uploads/${item.image}`}
+                                                src={`/uploads/categoryImage/${item.image}`}
                                                 alt={item.title}
                                                 className="w-10 h-10 rounded-full border border-gray-300"
                                             />
@@ -133,6 +133,7 @@ const ShowAllCategories = () => {
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onConfirm={confirmDelete}
+                fieldName={"Category"}
             />
             <ToastContainer position="top-right" autoClose={2000} />
         </>

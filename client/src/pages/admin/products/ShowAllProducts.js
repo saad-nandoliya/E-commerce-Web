@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 import DeleteModal from "../../../components/Modal/DeleteModal"
 
-
+// import jjkml from "../../../../public/uploads/productImage"
 
 const getApi = process.env.REACT_APP_GET_API;
 const deleteApi = process.env.REACT_APP_DELETE_API;
@@ -98,7 +98,7 @@ const ShowProduct = () => {
                                         <td className="px-4 py-3 text-center">{item.category_id}</td>
                                         <td className="px-4 py-3 flex justify-center">
                                             <img
-                                                src={`/uploads/${item.image}`}
+                                                src={`/uploads/productImage/${item.image}`}
                                                 alt="product"
                                                 className="w-10 h-10 rounded-full border border-gray-300"
                                             />
@@ -141,6 +141,7 @@ const ShowProduct = () => {
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onConfirm={confirmDelete}
+                fieldName={"Product"}
 
             />
             <ToastContainer position="top-right" autoClose={2000} />

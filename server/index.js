@@ -9,6 +9,7 @@ const userLogin = require("./routes/loginRoute/userLoginRoute")
 const adminUser = require("./routes/loginRoute/adminLoginRoute")
 const product = require("./routes/pagesRoute/productPageRoute")
 const category = require("./routes/pagesRoute/categoryRoutePage")
+const path = require("path")
 
 
 

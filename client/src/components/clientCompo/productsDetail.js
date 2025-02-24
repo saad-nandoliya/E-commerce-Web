@@ -38,7 +38,7 @@ const ProductsDetail = () => {
       <div className="max-w-5xl bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row gap-6 relative" >
         <div className="flex-1 flex justify-center sticky top-6 self-start">
           <img
-            src={`/uploads/${products.image}`}
+            src={`/uploads/productImage/${products.image}`}
             alt={products.name}
             className="w-[237px] h-[260px] sm:w-[300px] sm:h-[300px] md:w-[370px] md:h-[370px] lg:w-[400px] lg:h-[400px]  rounded-lg shadow-sm"
           />
