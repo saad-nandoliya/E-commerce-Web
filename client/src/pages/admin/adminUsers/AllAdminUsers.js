@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UserDeleteModal from "../../../components/Modal/DeleteModal"
+import DeleteModal from "../../../components/Modal/DeleteModal"
 
 
 const getAdminUserAPI = process.env.REACT_APP_GET_ADMIN_USER_API
@@ -104,7 +104,7 @@ const AllAdminUsers = () => {
                                             </label>
                                         </td>
                                         <td className="text-center space-x-1">
-                                            <NavLink to={`/admin/updatecategory/${user.id}`}>
+                                            <NavLink to={`/admin/updateadmin/${user.id}`}>
                                                 <button className="px-2 py-1 border text-blue-600 rounded-md hover:bg-gray-100 transition duration-300">
                                                     <i className="fa-solid fa-pencil text-sm"></i>
                                                 </button>
@@ -124,7 +124,7 @@ const AllAdminUsers = () => {
                 </main>
             </section>
 
-            <UserDeleteModal
+            <DeleteModal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onConfirm={confirmDelete}

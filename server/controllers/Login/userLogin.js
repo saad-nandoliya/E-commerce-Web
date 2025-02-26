@@ -107,63 +107,74 @@ const loginClientUser = async (req, res) => {
 //  ===================== GOOGLE LOGIN ======================= //
 const googleSignup = async (req, res) => {
     try {
-        const { google_id, email, username, picture } = req.body;
-
-
-        const checkEmail = "SELECT * FROM `users` WHERE username = ? OR email = ?"
-        db.query(checkEmail, [username, email], async (err, result) => {
-            if (err) {
-                console.error("Database error:", err.message);
-                return res.status(500).json({ message: "Database error. Try again later." });
-            }
-
-            if (result.length > 0) {
-                return res.status(400).json({ message: "Username Or Email already exists. Try another one!" });
-            }
-
-            db.query(
-                "SELECT * FROM users WHERE google_id = ?",
-                [google_id],
-                (err, result) => {
-                    if (err) {
-                        return res.status(500).json({ message: "Database error occurred" });
-                    }
-
-                    if (result.length > 0) {
-                        const user = result[0];
-                        const token = jwt.sign(
-                            { id: user.id, email: user.email },
-                            SECRET_KEY,
-                            { expiresIn: "1h" }
-                        );
-                        return res.status(200).json({ message: "Login successful", token });
-                    } else {
-                        db.query(
-                            "INSERT INTO users (google_id, username, email, picture) VALUES (?, ?, ?, ?)",
-                            [google_id, username, email, picture],
-                            (err, data) => {
-                                if (err) {
-                                    return res
-                                        .status(500)
-                                        .json({ message: "Database error occurred" });
-                                }
-
-                                const token = jwt.sign({ id: data.insertId, email }, SECRET_KEY, {
-                                    expiresIn: "1h",
-                                });
-                                return res
-                                    .status(201)
-                                    .json({ message: "Google Signup Successful!", token });
-                            }
-                        );
-                    }
-                }
+      const { google_id, email, username, picture } = req.body;
+  
+      const sql = "SELECT * FROM users WHERE email = ?";
+      db.query(sql, [email], async (err, results) => {
+        if (err) {
+          console.error("Database query error:", err.message);
+          return res.status(500).json({ message: "Server error" });
+        }
+  
+        // If user exists, update with google_id if not already present
+        if (results.length > 0) {
+          const user = results[0];
+          if (!user.google_id) {
+            // Update existing user to include the google_id
+            const updateSql = "UPDATE users SET google_id = ? WHERE email = ?";
+            db.query(updateSql, [google_id, email], (updateErr, updateData) => {
+              if (updateErr) {
+                console.error("Update error:", updateErr.message);
+                return res
+                  .status(500)
+                  .json({ message: "Database error occurred" });
+              }
+              const token = jwt.sign(
+                { id: user.id, email: user.email },
+                SECRET_KEY,
+                { expiresIn: "1h" }
+              );
+              return res.status(200).json({ message: "Login successful", token });
+            });
+          } else {
+            // If google_id exists, log the user in
+            const token = jwt.sign(
+              { id: user.id, email: user.email },
+              SECRET_KEY,
+              { expiresIn: "1h" }
             );
-        })
+            return res.status(200).json({ message: "Login successful", token });
+          }
+        } else {
+          // If user does not exist, create a new user
+          const insertSql =
+            "INSERT INTO users (google_id, username, email, picture) VALUES (?, ?, ?, ?)";
+          db.query(
+            insertSql,
+            [google_id, username, email, picture],
+            (insertErr, data) => {
+              if (insertErr) {
+                console.error("Insert error:", insertErr.message);
+                return res
+                  .status(500)
+                  .json({ message: "Database error occurred" });
+              }
+              const token = jwt.sign({ id: data.insertId, email }, SECRET_KEY, {
+                expiresIn: "1h",
+              });
+              return res
+                .status(201)
+                .json({ message: "User registered successfully", token });
+            }
+          );
+        }
+      });
     } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ message: "Server error occurred" });
-    }
-};
+      console.error("Error:", error);
+      res.status(500).json({ message: "Server error occurred" });
+    }
+  };
+  
+
 
 module.exports = { registerNewUser, loginClientUser, googleSignup };

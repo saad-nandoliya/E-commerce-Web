@@ -1,7 +1,14 @@
 import React from 'react'
-import {NavLink} from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { useCart } from '../../context/cart'
 
-const productCard = ({ id, image, name, price, onAddToCart }) => {
+const ProductCard = ({ id, image, name, price }) => {
+    const { cart, addToCart } = useCart()
+    const navigate = useNavigate()
+
+    const product = { id, name, price, image }
+
+    const isInCart = cart.some((item) => item.id === id)
     return (
         <>
             <div
@@ -24,12 +31,24 @@ const productCard = ({ id, image, name, price, onAddToCart }) => {
 
                 <p className="text-gray-600 text-xs">${price}</p>
 
-                <button onClick={onAddToCart} className="w-full mt-2 px-3 py-2 bg-black text-white  text-xs rounded-md hover:bg-gray-800">
-                    Add To Cart
-                </button>
+                {isInCart ? (
+                    <button
+                        onClick={() => navigate("/cart")}
+                        className="mt-2 w-full px-3 py-2 bg-green-600 text-white text-xs rounded-md hover:bg-green-700"
+                    >
+                        Go to Cart
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => addToCart(product)}
+                        className="mt-2 w-full px-3 py-2 bg-black text-white text-xs rounded-md hover:bg-gray-800"
+                    >
+                        Add To Cart
+                    </button>
+                )}
             </div>
         </>
     )
 }
 
-export default productCard
+export default ProductCard

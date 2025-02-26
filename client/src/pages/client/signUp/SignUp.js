@@ -72,7 +72,7 @@ const SignUp = () => {
         const res = await axios.post(`${GoogleRegisterAPI}`, userPayload);
 
         localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userInfo", JSON.stringify(userPayload)); // Add this line
+        localStorage.setItem("userInfo", JSON.stringify(userPayload)); 
         if (res.status === 201) {
           toast.success(res.data.message);
         }

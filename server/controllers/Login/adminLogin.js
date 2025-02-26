@@ -14,7 +14,7 @@ const addAdminUser = async (req, res) => {
         }
 
         const checkEmail = "SELECT * FROM `admin_users` WHERE username = ? OR email = ?"
-        db.query(checkEmail, [username,email], async (err, result) => {
+        db.query(checkEmail, [username, email], async (err, result) => {
             if (err) {
                 console.error("Database error:", err.message);
                 return res.status(500).json({ message: "Database error. Try again later." });
@@ -71,13 +71,13 @@ const loginAdminUser = async (req, res) => {
                     .json({ message: "Invalid email or password" });
             }
 
-            for (user of results) {
-                const isPasswordValid = await bcrypt.compare(password, user.password);
+            const user = results[0]
+            const isPasswordValid = await bcrypt.compare(password, user.password);
 
-                if (isPasswordValid) {
-                    return res.status(200).json({ message: "Login successful" });
-                }
+            if (isPasswordValid) {
+                return res.status(200).json({ message: "Login successful" });
             }
+
             return res.status(401).json({ message: "Invalid email or password" });
         });
     } catch (error) {
@@ -103,16 +103,60 @@ const deleteAdminUser = (req, res) => {
     const id = req.params.id;
     const q = "DELETE FROM admin_users WHERE id =?";
     db.query(q, id, (err) => {
-      if (err) {
-        return res.status(500);
-      }
-      return res.json(200);
+        if (err) {
+            return res.status(500);
+        }
+        return res.json(200);
     });
-  };
+};
+
+
+
+// ==================================== (update users api) ====================================
+const updateAdminUser = async (req, res) => {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sqlQuery =
+    "UPDATE admin_users SET username = ?, email = ?, password = ? WHERE id = ?";
+    const data = [username, email, hashedPassword, id];
+    
+    db.query(sqlQuery, data, (err) => {
+        if (err) {
+            console.error("Database error:", err.message);
+            return res.status(500).json({
+                message: "Database query error. Please try again later.",
+            });
+        }
+        
+        return res.status(200).json({
+            message: "User updated successfully.",
+        });
+    });
+};
+
+
+// ==================================== (get user by id api) ====================================
+const getAdminUsersById = (req, res) => {
+    const { id } = req.params;
+    const sqlQuery = "SELECT * FROM admin_users WHERE id = ?";
+    db.query(sqlQuery, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: "Database query error" });
+        }
+        res.json(results);
+    });
+};
+
+
 
 module.exports = {
     addAdminUser,
     loginAdminUser,
     getAdminUsers,
     deleteAdminUser,
+    updateAdminUser,
+    getAdminUsersById,
+
 };

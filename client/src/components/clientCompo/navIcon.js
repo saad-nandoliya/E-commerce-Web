@@ -2,11 +2,13 @@ import { useState } from "react";
 import { FaUser, FaShoppingCart } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { NavLink } from "react-router-dom";
+import { useCart } from "../../context/cart";
 
 function NavIcon() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const userToken = localStorage.getItem("token");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const { totalItems } = useCart()
 
   const handleProfile = () => {
     setIsProfileOpen((prev) => !prev);
@@ -109,9 +111,12 @@ function NavIcon() {
       <div className="relative cursor-pointer">
         <NavLink to="/cart">
           <FaShoppingCart />
-          <div className="absolute -top-[11px] -right-[10px] w-4 h-4 p-[10px] bg-SR rounded-full text-white text-[10px] text-center flex items-center justify-center">
-            10
+
+          {totalItems > 0 && (<div className="absolute -top-[11px] -right-[10px] w-4 h-4 p-[10px] bg-SR rounded-full text-white text-[10px] text-center flex items-center justify-center">
+            {totalItems}
           </div>
+
+          )}
         </NavLink>
       </div>
     </div>
