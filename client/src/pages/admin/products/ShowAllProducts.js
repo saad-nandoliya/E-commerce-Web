@@ -10,6 +10,7 @@ import DeleteModal from "../../../components/Modal/DeleteModal"
 
 const getApi = process.env.REACT_APP_GET_API;
 const deleteApi = process.env.REACT_APP_DELETE_API;
+const StatusUpdate = process.env.REACT_APP_UPDATE_PRODUCT_STATUS_API;
 
 const ShowProduct = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -54,6 +55,20 @@ const ShowProduct = () => {
                 error.response?.data || error.message
             );
             toast.error("Failed to delete product. Please try again.");
+        }
+    };
+
+    const toggleStatus = async (id, currentStatus) => {
+        const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+        try {
+            await axios.put(`${StatusUpdate}/${id}`, { status: newStatus });
+            toast.success(`Product status updated to ${newStatus}!`);
+
+            fetchProduct();
+        } catch (error) {
+            console.error("Error updating status:", error);
+            toast.error("Failed to update status.");
         }
     };
 
@@ -108,13 +123,17 @@ const ShowProduct = () => {
                                         <td className="px-4 py-3 text-center">{item.price}</td>
                                         <td className="px-4 py-3 text-center">
                                             <label className="relative inline-block w-8 h-4">
-                                                <input type="checkbox" className="peer sr-only" />
+                                                <input
+                                                    type="checkbox"
+                                                    checked={item.status === "active"}
+                                                    onChange={() => toggleStatus(item.id, item.status)}
+                                                    className="peer sr-only" />
                                                 <span className="block w-full h-full bg-gray-300 rounded-full peer-focus:ring-2 peer-focus:ring-blue-500 peer-checked:bg-blue-500 transition-colors duration-300"></span>
                                                 <span className="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow-md transform peer-checked:translate-x-4 transition-transform duration-300"></span>
                                             </label>
                                         </td>
                                         <td className="text-center space-x-1">
-                                            {/* Edit Button */}
+                                        
                                             <NavLink to={`/admin/updateproduct/${item.id}`}>
                                                 <button className="px-2 py-1 border text-blue-600 rounded-md hover:bg-gray-100 transition duration-300">
                                                     <i className="fa-solid fa-pencil text-sm"></i>

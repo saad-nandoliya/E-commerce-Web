@@ -45,6 +45,7 @@ const CategoryList = () => {
                 image={product.image}
                 name={product.name}
                 price={product.price}
+                status={product.status}
               />
             ))}
           </div>

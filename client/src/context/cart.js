@@ -34,7 +34,7 @@ export const CartProvider = ({ children }) => {
     const increaseQty = (id) => {
         setCart((prevCart) =>
             prevCart.map((item) =>
-                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+                item.id === id ? { ...item, quantity: item.quantity < 10 ? item.quantity + 1 : 10  } : item
             )
         );
     };
@@ -42,11 +42,9 @@ export const CartProvider = ({ children }) => {
     // Decrease Quantity
     const decreaseQty = (id) => {
         setCart((prevCart) =>
-            prevCart
-                .map((item) =>
-                    item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-                )
-                .filter((item) => item.quantity > 0)
+            prevCart.map((item) =>
+                item.id === id ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
+            )
         );
     };
 

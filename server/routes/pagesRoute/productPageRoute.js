@@ -1,6 +1,6 @@
 const express = require("express");
 const products = require("../../controllers/pages/productPage");
-const {productLocation} = require("../../middlewares/fileHandler");
+const { productLocation } = require("../../middlewares/fileHandler");
 
 const router = express.Router();
 
@@ -17,5 +17,6 @@ router.get(
   "/getproductsbycategory/:id",
   products.getProductsByCategory
 );
+router.route('/updatestatus/:id').put(products.updateStatus)
 
 module.exports = router;

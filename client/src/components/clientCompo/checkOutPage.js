@@ -48,9 +48,9 @@ const CheckoutPage = () => {
 
           {/* Submit Button */}
           <Link to="/ordertrack">
-          <button type="submit" className="w-full bg-black text-white p-2 rounded">
-            Place Order
-          </button>
+            <button type="submit" className="w-full bg-black text-white p-2 rounded">
+              Place Order
+            </button>
           </Link>
         </form>
       </div>
@@ -58,4 +58,4 @@ const CheckoutPage = () => {
   );
 };
 
-export default CheckoutPage;
+export default CheckoutPage;

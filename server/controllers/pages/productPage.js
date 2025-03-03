@@ -30,13 +30,13 @@ const addProducts = (req, res) => {
   const image = req.file ? req.file.filename : null;
 
   const q =
-    "INSERT INTO products (name, price, description, image,  category_id) VALUES (?,?,?,?,?)";
+    "INSERT INTO products (name, price, description, image, status,  category_id) VALUES (?,?,?,?,?,?)";
 
-  const values = [name, price, description, image, category_id];
+  const values = [name, price, description, image, "active", category_id];
 
   db.query(q, values, (err, data) => {
     if (err) {
-      console.error("Database Error:", err); // Debugging error
+      console.error("Database Error:", err);
       return res.status(500).json({ error: "Internal Server Error" });
     }
     return res.json({
@@ -49,8 +49,7 @@ const addProducts = (req, res) => {
 
 const updateProducts = (req, res) => {
   const id = req.params.id;
-  console.log(id);
-  const { name, price, description } = req.body;
+  const { name, price,description, category_id } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
   const selectQuery = "SELECT image FROM products WHERE id = ?";
@@ -69,8 +68,8 @@ const updateProducts = (req, res) => {
     }
 
 
-    const updateQuery = "UPDATE products SET name =?, price =?, description =?, image=? WHERE id =?";
-    const values = [name, price, description, newImage || oldImage, id];
+    const updateQuery = "UPDATE products SET name =?, price =?, description =?, category_id=?, image=? WHERE id =?";
+    const values = [name, price, description, category_id, newImage || oldImage, id];
     db.query(updateQuery, values, (err, result) => {
       if (err) return res.status(500).json({ message: "Error updating product" });
 
@@ -108,7 +107,6 @@ const deleteProducts = (req, res) => {
 
 const getProductsByCategory = (req, res) => {
   const category = req.params.id;
-  console.log(category);
   const q = "SELECT * FROM products WHERE category_id = ?";
   db.query(q, [category], (err, result) => {
     if (err) {
@@ -120,6 +118,20 @@ const getProductsByCategory = (req, res) => {
   });
 };
 
+
+
+const updateStatus = (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const query = "UPDATE products SET status = ? WHERE id = ?";
+  db.query(query, [status, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    return res.json({ message: "Products status updated successfully!" });
+  });
+};
+
+
 module.exports = {
   getAllProducts,
   getProductsById,
@@ -127,4 +139,5 @@ module.exports = {
   updateProducts,
   deleteProducts,
   getProductsByCategory,
+  updateStatus,
 };

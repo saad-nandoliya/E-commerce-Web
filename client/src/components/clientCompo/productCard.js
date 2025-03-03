@@ -2,13 +2,15 @@ import React from 'react'
 import { NavLink, useNavigate } from "react-router-dom"
 import { useCart } from '../../context/cart'
 
-const ProductCard = ({ id, image, name, price }) => {
+const ProductCard = ({ id, image, name, price, status }) => {
     const { cart, addToCart } = useCart()
     const navigate = useNavigate()
 
     const product = { id, name, price, image }
 
     const isInCart = cart.some((item) => item.id === id)
+
+    const isOutOfStock = status === "inactive"
     return (
         <>
             <div
@@ -31,7 +33,14 @@ const ProductCard = ({ id, image, name, price }) => {
 
                 <p className="text-gray-600 text-xs">${price}</p>
 
-                {isInCart ? (
+                {isOutOfStock ? (
+                    <button
+                        className="mt-2 w-full px-3 py-2 bg-gray-400 text-white text-xs rounded-md cursor-not-allowed"
+                        disabled
+                    >
+                        Add To Cart{" "}
+                    </button>
+                ) : isInCart ? (
                     <button
                         onClick={() => navigate("/cart")}
                         className="mt-2 w-full px-3 py-2 bg-green-600 text-white text-xs rounded-md hover:bg-green-700"
@@ -46,6 +55,7 @@ const ProductCard = ({ id, image, name, price }) => {
                         Add To Cart
                     </button>
                 )}
+
             </div>
         </>
     )
