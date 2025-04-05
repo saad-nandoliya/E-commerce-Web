@@ -9,9 +9,11 @@ const LoginAPI = process.env.REACT_APP_LOGIN_API;
 const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        email: "",
+        email_or_phone: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -23,26 +25,15 @@ const Login = () => {
 
         try {
             const res = await axios.post(`${LoginAPI}`, formData);
-
-            console.log("Backend Response:", res.data);
-
             if (!res.data.user) {
-                console.error("User data missing in response!");
+                console.error("User missing from Login API response");
                 return;
             }
-
-            const userPayload = {
-                username: res.data.user.username,
-                email: res.data.user.email,
-                picture: res.data.user.picture || "https://i.pravatar.cc/100",
-            };
-
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("userInfo", JSON.stringify(userPayload));
+            localStorage.setItem("user_Id", res.data.user.id);
 
             toast.success("User Login successfully!", {
                 position: "top-right",
-                autoClose: 3000,
+                autoClose: 1000,
             });
 
             navigate("/");
@@ -51,7 +42,7 @@ const Login = () => {
 
             toast.error("Failed to Login. Try again!", {
                 position: "top-right",
-                autoClose: 3000,
+                autoClose: 1000,
             });
         }
     };
@@ -60,8 +51,8 @@ const Login = () => {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <ToastContainer />
+        <div className=" flex items-center justify-center p-4">
+            <ToastContainer autoClose={1000}/>
 
             <div className="bg-white rounded-lg p-2 shadow-[rgba(100,100,111,0.2)_0px_7px_29px_0px] flex flex-col md:flex-row w-full max-w-5xl">
                 <div className="w-full md:w-1/2 hidden md:flex">
@@ -79,22 +70,31 @@ const Login = () => {
                     <form onSubmit={handleSubmit}>
                         <input
                             onChange={handleInputChange}
-                            type="email"
-                            name="email"
-                            value={formData.email}
+                            type="text"
+                            name="email_or_phone"
+                            value={formData.email_or_phone}
                             required
                             placeholder="Email"
                             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
-                        <input
-                            onChange={handleInputChange}
-                            name="password"
-                            value={formData.password}
-                            type="password"
-                            required
-                            placeholder="Password"
-                            className="w-full px-4 py-2 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                        />
+                        <span className="relative mt-6">
+                            <input
+                                onChange={handleInputChange}
+                                name="password"
+                                value={formData.password}
+                                type={showPassword ? "text" : "password"}
+                                required
+                                placeholder="Password"
+                                className="w-full px-4 py-2 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-[-1px] text-gray-600 focus:outline-none border-l-2 border-[#EAE8E8] pl-3"
+                            >
+                                {showPassword ? <i className="fa-regular fa-eye-slash"></i> : <i className="fa-regular fa-eye"></i>}
+                            </button>
+                        </span>
 
                         <button type="submit" className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800">
                             Login
@@ -106,7 +106,7 @@ const Login = () => {
                     </div>
                     <p className="text-center text-gray-600 mt-4">
                         Create new account?{" "}
-                        <Link to="/signup" className="text-blue-500">
+                        <Link to="/signup" className="text-blue-600">
                             Sign up
                         </Link>
                     </p>

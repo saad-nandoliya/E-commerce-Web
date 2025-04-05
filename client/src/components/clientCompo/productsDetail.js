@@ -3,89 +3,115 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../../context/cart";
 
-const GetProByIdAPI = process.env.REACT_APP_GET_BY_ID_API;
+const BASE_URL = "http://localhost:4500"; // API base URL
 
 const ProductsDetail = () => {
-  const [products, setProducts] = useState(null);
-  const { id } = useParams();
-  const { addToCart, cart } = useCart()
-  const navigate = useNavigate()
+    const [product, setProduct] = useState(null);
+    const { id } = useParams();
+    const { addToCart, cart } = useCart();
+    const navigate = useNavigate();
 
+    const isInCart = cart.some((item) => item.id === Number(id));
+    const isOutOfStock = product?.status === "inactive";
 
-  const isInCart = cart.some((item) => item.id === Number(id));
+    useEffect(() => {
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
 
-  useEffect(() => {
-    if (id) {
-      fetchProducts();
+    const fetchProduct = async () => {
+        try {
+            const res = await axios.get(`${BASE_URL}/getproductsbyid/${id}`);
+            setProduct(res.data[0] || null);
+        } catch (error) {
+            console.error("Error fetching product:", error);
+        }
+    };
+
+    if (!product) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Loading...
+            </div>
+        );
     }
-  }, [id]);
 
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get(`${GetProByIdAPI}${id}`);
-      setProducts(res.data[0] || null);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    }
-  };
-
-  if (!products) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+            <div className="max-w-6xl w-full bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
+                {/* Product Image */}
+                <div className=" md:w-1/2 bg-gray-200 flex items-center justify-center p-6">
+                    <img
+                        src={`/uploads/productImage/${product.image}`}
+                        alt={product.name}
+                        className="sm:object-contain sm:h-96 rounded-lg"
+                    />
+                </div>
+
+                {/* Product Details */}
+                <div className="w-full md:w-1/2 p-6 flex flex-col justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
+                        <p className="text-sm text-gray-500 mt-1 uppercase">by James Anderson</p>
+
+                        {/* Pricing Section */}
+                        <div className="mt-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-gray-400 line-through text-xl">₹{Number(product.price) + 100}</span>
+                                <span className="text-green-600 font-bold text-2xl">₹{product.price}</span>
+                            </div>
+                            <div className="mt-4">
+                                {isOutOfStock ? (
+                                    <p className="text-sm text-red-600 font-semibold">🔴 Out of Stock</p>
+                                ) : (
+                                    <p className="text-sm text-green-600 font-semibold">🟢 In Stock</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="mt-4">
+                            <h3 className="font-semibold text-gray-800 mb-1">Description : </h3>
+                            <p
+                                className="text-gray-600 text-sm"
+                                dangerouslySetInnerHTML={{ __html: product.description }}
+                            ></p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 border-t pt-4">
+
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3">
+                            {isOutOfStock ? (
+                                <button className="bg-gray-400 text-white px-5 py-2 rounded-md w-full cursor-not-allowed">
+                                    Out of Stock
+                                </button>
+                            ) : isInCart ? (
+                                <button
+                                    onClick={() => navigate("/cart")}
+                                    className="bg-green-600 text-white px-5 py-2 rounded-md w-full"
+                                >
+                                    Go to Cart
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => addToCart(product)}
+                                    className="border border-gray-400 text-gray-600 px-5 py-2 rounded-md w-full"
+                                >
+                                    Add to Cart
+                                </button>
+                            )}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
-  }
 
-
-
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="max-w-5xl bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row gap-6 relative" >
-        <div className="flex-1 flex justify-center sticky top-6 self-start">
-          <div>
-            <img
-              src={`/uploads/productImage/${products.image}`}
-            alt={products.name}
-            className="w-[237px] h-[260px] sm:w-[300px] sm:h-[300px] md:w-[370px] md:h-[370px] lg:w-[400px] lg:h-[400px]  rounded-lg shadow-sm"
-            />
-            {isInCart ? (
-              <button
-                onClick={() => navigate("/cart")}
-                className="mt-2 w-full px-3 py-2 bg-green-600 text-white text-xs rounded-md hover:bg-green-700"
-              >
-                Go to Cart
-              </button>
-            ) : (
-              <button
-                onClick={() => addToCart(products)}
-                className="mt-2 w-full px-3 py-2 bg-black text-white text-xs rounded-md hover:bg-gray-800"
-              >
-                Add To Cart
-              </button>
-            )}
-          </div>
-
-        </div>
-
-        <div className="flex-1 flex flex-col justify-start p-4 space-y-4 overflow-y-auto bg-gray-50 rounded-lg
-         [&::-webkit-scrollbar]:w-1
-  [&::-webkit-scrollbar-track]:bg-[rgba(231,229,229,0.64)]
-  [&::-webkit-scrollbar-thumb]:bg-blue-600 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-thumb]:rounded-lg" style={{ maxHeight: '80vh' }}>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">{products.name}</h2>
-          <p>
-            <strong className="inline-block">Description:</strong>
-            <span dangerouslySetInnerHTML={{ __html: products.description }}></span>
-          </p>
-
-          <p className="text-xl md:text-2xl font-semibold mt-4">
-            ${products.price}
-          </p>
-
-        </div>
-      </div>
-    </div>
-  );
 };
 
 export default ProductsDetail;

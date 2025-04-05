@@ -9,8 +9,7 @@ const userLogin = require("./routes/loginRoute/userLoginRoute")
 const adminUser = require("./routes/loginRoute/adminLoginRoute")
 const product = require("./routes/pagesRoute/productPageRoute")
 const category = require("./routes/pagesRoute/categoryRoutePage")
-const path = require("path")
-
+const CartItem = require("./routes/pagesRoute/cartItemRoutePage")
 
 
 const app = express()
@@ -24,6 +23,7 @@ app.use("/", userLogin)
 app.use("/", adminUser)
 app.use("/", product)
 app.use("/", category)
+app.use("/", CartItem)
 
 
 

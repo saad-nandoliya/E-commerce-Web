@@ -31,7 +31,7 @@ const ProductCard = ({ id, image, name, price, status }) => {
                     {name}
                 </h2>
 
-                <p className="text-gray-600 text-xs">${price}</p>
+                <p className="text-gray-600 text-xs">₹{price}</p>
 
                 {isOutOfStock ? (
                     <button
@@ -55,7 +55,6 @@ const ProductCard = ({ id, image, name, price, status }) => {
                         Add To Cart
                     </button>
                 )}
-
             </div>
         </>
     )

@@ -6,8 +6,7 @@ import { useCart } from "../../context/cart";
 
 function NavIcon() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const userToken = localStorage.getItem("token");
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("user_Id"));
   const { totalItems } = useCart()
 
   const handleProfile = () => {
@@ -15,8 +14,7 @@ function NavIcon() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userInfo");
+    localStorage.removeItem("user_Id");
     setIsProfileOpen(false);
     window.location.reload();
   };
@@ -24,7 +22,7 @@ function NavIcon() {
   return (
     <div className="flex items-center gap-4 xl:6 relative">
       {/* User Profile Icon */}
-      {userToken ? (
+      {userInfo ? (
         <img
           src={
             userInfo?.picture ||
@@ -51,7 +49,7 @@ function NavIcon() {
           </div>
 
           {/* Profile Content */}
-          {userToken ? (
+          {userInfo ? (
             <>
               {/* Profile Image */}
               <div className="flex justify-center mt-4">
@@ -70,7 +68,7 @@ function NavIcon() {
                   {userInfo?.username}
                 </p>
                 <p className="text-gray-500 w-full break-words">
-                  {userInfo?.email}
+                  {userInfo?.email_or_phone}
                 </p>
 
                 {/* Logout Button */}

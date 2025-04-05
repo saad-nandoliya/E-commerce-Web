@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 import DeleteModal from "../../../components/Modal/DeleteModal"
 
-// import jjkml from "../../../../public/uploads/productImage"
 
 const getApi = process.env.REACT_APP_GET_API;
 const deleteApi = process.env.REACT_APP_DELETE_API;

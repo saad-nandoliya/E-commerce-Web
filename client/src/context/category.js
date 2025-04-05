@@ -17,7 +17,6 @@ export const CategoryProvider = ({ children }) => {
         try {
             const res = await axios.get(GetCategoryAPI);
             setCategories(res.data);
-            console.log(res.data)
         } catch (error) {
             console.log("Error fetching categories:", error);
         }

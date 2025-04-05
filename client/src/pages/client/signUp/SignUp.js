@@ -2,19 +2,19 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
-
 
 const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API;
-const GoogleRegisterAPI = process.env.REACT_APP_GOOGLE_REGISTER_API;
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const SendOTPAPI = process.env.REACT_APP_SEND_OTP_API;
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   const [userData, setUserData] = useState({
     username: "",
-    email: "",
+    email_or_phone: "",
     password: "",
+    otp: "",
   });
 
   const handleInputChange = (e) => {
@@ -22,148 +22,140 @@ const SignUp = () => {
     setUserData({ ...userData, [name]: value });
   };
 
+  const handleSendOTP = async () => {
+    if (!userData.email_or_phone) {
+      toast.error("Please enter Email or Phone.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${SendOTPAPI}`, { email_or_phone: userData.email_or_phone });
+
+      if (res.status === 200) {
+        toast.success("OTP sent successfully!");
+        setOtpSent(true);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to send OTP.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post(`${UserRegisterAPI}`, userData);
 
-      const userPayload = {
-        username: userData.username,
-        email: userData.email,
-        picture: "",
-      };
-
-      // LocalStorage me user info store karo
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userInfo", JSON.stringify(userPayload));
-
-      setTimeout(() => {
-        if (res.status === 201) {
-          toast.success(res.data.message, { autoClose: 2000 });
-        }
-      }, 100)
-      navigate("/login");
-    } catch (error) {
-      if (error.response.status === 400) {
-        toast.error(error.response.data.message);
-      } else {
-        console.error("Error adding user:", error);
-        toast.error("Something went wrong. Please try again.");
+      if (res.status === 201) {
+        setTimeout(() => toast.success(res.data.message), 1000);
       }
+      navigate("/login")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong.");
     }
   };
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const { data } = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          }
-        );
-        const userPayload = {
-          google_id: data.sub,
-          email: data.email,
-          username: data.name,
-          picture: data.picture,
-        };
-
-        const res = await axios.post(`${GoogleRegisterAPI}`, userPayload);
-
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userInfo", JSON.stringify(userPayload)); 
-        if (res.status === 201) {
-          toast.success(res.data.message);
-        }
-        navigate("/");
-      } catch (error) {
-        if (error.response.status === 400) {
-          toast.error(error.response.data.message);
-        } else {
-          console.error("Error adding user:", error);
-          toast.error("Something went wrong. Please try again.");
-        }
-      }
-    },
-    onError: () => toast.error("Google Login Failed!", { autoClose: 3000 }),
-  });
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <div className=" flex items-center justify-center">
-        <ToastContainer />
-        <div className="bg-white rounded-lg p-2 shadow-md flex w-full max-w-5xl">
-          {/* Left Image Section */}
-          <div className="w-1/2 hidden md:flex">
-            <img
-              src={require("../../../assets/images/shopping.png")}
-              alt="Signup"
-              className="max-w-full h-auto rounded-lg"
+    <div className="flex items-center justify-center">
+      <ToastContainer />
+      <div className="bg-white rounded-lg p-2 shadow-md flex w-full max-w-5xl">
+        
+        {/* Left Image Section */}
+        <div className="w-1/2 hidden md:flex">
+          <img
+            src={require("../../../assets/images/shopping.png")}
+            alt="Signup"
+            className="max-w-full h-auto rounded-lg"
+          />
+        </div>
+
+        {/* Right Form Section */}
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-2xl font-bold mb-2">Create an account</h2>
+          <p className="text-gray-600 mb-6">Enter your details below</p>
+
+          <form onSubmit={handleSubmit} className="relative">
+            <input
+              type="text"
+              name="username"
+              value={userData.username}
+              onChange={handleInputChange}
+              required
+              placeholder="Username"
+              className="w-full px-4 py-2 mb-4 border rounded-lg focus:ring-2 focus:ring-red-500"
             />
-          </div>
 
-          {/* Right Form Section */}
-          <div className="w-full md:w-1/2 p-8">
-            <h2 className="text-2xl font-bold mb-2">Create an account</h2>
-            <p className="text-gray-600 mb-6">Enter your details below</p>
-
-            <form onSubmit={handleSubmit}>
+            {/* Email / Phone Input + Send OTP Button */}
+            <div className="relative w-full mb-4">
               <input
                 type="text"
-                name="username"
-                value={userData.username}
-                onChange={handleInputChange}
-                required
-                placeholder="Username"
-                className="w-full px-4 py-2 mb-4 border rounded-lg focus:ring-2 focus:ring-red-500"
-              />
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
+                name="email_or_phone"
+                value={userData.email_or_phone}
                 onChange={handleInputChange}
                 required
                 placeholder="Email"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
+              />
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="absolute right-[2px] top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600"
+              >
+                Send
+              </button>
+            </div>
+
+            {/* OTP Input (Only shows when Send OTP is clicked) */}
+            {otpSent && (
+              <input
+                type="text"
+                name="otp"
+                value={userData.otp}
+                onChange={handleInputChange}
+                required
+                placeholder="Enter OTP"
                 className="w-full px-4 py-2 mb-4 border rounded-lg focus:ring-2 focus:ring-red-500"
               />
+            )}
+
+            {/* Password Input */}
+            <div className="relative w-full">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={userData.password}
                 onChange={handleInputChange}
                 required
                 placeholder="Password"
-                className="w-full px-4 py-2 mb-6 border rounded-lg focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
               />
-
-              <button className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800">
-                Sign up
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 focus:outline-none border-l-2 border-[#EAE8E8] pl-3"
+              >
+                {showPassword ? <i className="fa-regular fa-eye-slash"></i> : <i className="fa-regular fa-eye"></i>}
               </button>
-            </form>
-
-            <div className="my-4 flex items-center justify-center">
-              <hr className="flex-grow border-gray-300" />
             </div>
 
-            {/* Google Signup Button */}
-            <button
-              onClick={() => googleLogin()}
-              className="w-full flex items-center justify-center border py-2 rounded-lg hover:bg-gray-100"
-            >
-              <img src={require("../../../assets/images/google.png")} alt="Google" className="w-5 h-5 mr-2" />
-              Sign up with Google
+            <button className="w-full bg-black text-white py-2 mt-4 rounded-lg font-semibold hover:bg-gray-800">
+              Sign up
             </button>
+          </form>
 
-            <p className="text-center text-gray-600 mt-4">
-              Already have an account?{" "}
-              <NavLink to="/login" className="text-blue-500">
-                Log in
-              </NavLink>
-            </p>
+          <div className="my-4 flex items-center justify-center">
+            <hr className="flex-grow border-gray-300" />
           </div>
+
+          <p className="text-center text-gray-600 mt-4">
+            Already have an account?{" "}
+            <NavLink to="/login" className="text-blue-500">
+              Log in
+            </NavLink>
+          </p>
         </div>
       </div>
-    </GoogleOAuthProvider>
+    </div>
   );
 };
+
 export default SignUp;

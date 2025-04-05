@@ -17,7 +17,6 @@ const CategoryList = () => {
         const res = await axios.get(
           `${getProductsByCategoryAPI}${category_id}`
         );
-        console.log(res.data);
         setCategories(res.data);
       } catch (error) {
         console.log("Error fetching products:", error);

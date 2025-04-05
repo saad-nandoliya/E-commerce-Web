@@ -9,6 +9,7 @@ import DeleteModal from "../../../components/Modal/DeleteModal"
 
 const getAdminUserAPI = process.env.REACT_APP_GET_ADMIN_USER_API
 const deleteAdminUserAPI = process.env.REACT_APP_DELETE_ADMIN_USER_API
+const updateAdminStatus = process.env.REACT_APP_UPDATE_ADMIN_STATUS
 
 const AllAdminUsers = () => {
     const [adminUsersData, setAdminUsersData] = useState([])
@@ -48,6 +49,19 @@ const AllAdminUsers = () => {
     };
 
 
+    const toggleStatus = async (id, currentStatus) => {
+        const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+        try {
+            await axios.put(`${updateAdminStatus}/${id}`, { status: newStatus });
+            toast.success(`Admin user status updated to ${newStatus}!`);
+
+            fetchUsers();
+        } catch (error) {
+            console.error("Error updating status:", error);
+            toast.error("Failed to update status.");
+        }
+    };
 
     return (
         <>
@@ -98,7 +112,11 @@ const AllAdminUsers = () => {
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <label className="relative inline-block w-8 h-4">
-                                                <input type="checkbox" className="peer sr-only" />
+                                                <input 
+                                                type="checkbox"
+                                                checked={user.status === "active"}
+                                                onChange={() => toggleStatus(user.id, user.status)}
+                                                className="peer sr-only" />
                                                 <span className="block w-full h-full bg-gray-300 rounded-full peer-checked:bg-blue-500 transition-colors duration-300"></span>
                                                 <span className="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow-md transform peer-checked:translate-x-4 transition-transform duration-300"></span>
                                             </label>

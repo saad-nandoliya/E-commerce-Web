@@ -9,6 +9,7 @@ router.route("/get-admin-user").get(adminUserRoute.getAdminUsers)
 router.route("/delete-admin-user/:id").delete(adminUserRoute.deleteAdminUser)
 router.route("/update-admin-user/:id").put(adminUserRoute.updateAdminUser);
 router.route("/get-admin-by-id/:id").get(adminUserRoute.getAdminUsersById);
+router.route("/update-admin-status/:id").put(adminUserRoute.updateAdminStatus);
 
 
 module.exports = router

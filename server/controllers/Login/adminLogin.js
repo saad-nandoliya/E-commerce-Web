@@ -26,8 +26,8 @@ const addAdminUser = async (req, res) => {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const sqlQuery = "INSERT INTO `admin_users` (username, email, password) VALUES (?, ?, ?)";
-            const data = [username, email, hashedPassword];
+            const sqlQuery = "INSERT INTO `admin_users` (username, status, email, password) VALUES (?, ?, ?, ?)";
+            const data = [username, "active", email, hashedPassword];
 
             db.query(sqlQuery, data, (err) => {
                 if (err) {
@@ -52,9 +52,7 @@ const loginAdminUser = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res
-                .status(400)
-                .json({ message: "email and password are required." });
+            return res.status(400).json({ message: "Email and password are required." });
         }
 
         const sql = "SELECT * FROM `admin_users` WHERE email = ?";
@@ -66,12 +64,15 @@ const loginAdminUser = async (req, res) => {
             }
 
             if (results.length === 0) {
-                return res
-                    .status(401)
-                    .json({ message: "Invalid email or password" });
+                return res.status(401).json({ message: "Invalid email or password" });
             }
 
-            const user = results[0]
+            const user = results[0];
+
+            if (user.status === "inactive") {
+                return res.status(403).json({ message: "Your account is inactive. Please contact support." });
+            }
+
             const isPasswordValid = await bcrypt.compare(password, user.password);
 
             if (isPasswordValid) {
@@ -85,6 +86,7 @@ const loginAdminUser = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 // ==================================== (show users api) ====================================
 const getAdminUsers = (req, res) => {
@@ -151,6 +153,18 @@ const getAdminUsersById = (req, res) => {
 
 
 
+
+const updateAdminStatus = (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+  
+    const query = "UPDATE admin_users SET status = ? WHERE id = ?";
+    db.query(query, [status, id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      return res.json({ message: "Products status updated successfully!" });
+    });
+  };
+
 module.exports = {
     addAdminUser,
     loginAdminUser,
@@ -158,5 +172,11 @@ module.exports = {
     deleteAdminUser,
     updateAdminUser,
     getAdminUsersById,
+    updateAdminStatus,
 
 };
+
+
+
+
+
