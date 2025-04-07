@@ -160,7 +160,7 @@ const CheckoutPage = () => {
                     className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"
                   >
                     <option value="credit_card">Credit Card</option>
-                    <option value="paypal">PayPal</option>
+                    <option value="paypal">UPI</option>
                     <option value="cod">Cash on Delivery</option>
                   </select>
                 </div>
