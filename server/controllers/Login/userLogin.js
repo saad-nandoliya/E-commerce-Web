@@ -23,7 +23,7 @@ const sendOtp = async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
-    console.log(otp)
+
 
     otpStore.set(email_or_phone, { otp, expiresAt: Date.now() + 300000 }); // Store OTP for 5 minutes
 

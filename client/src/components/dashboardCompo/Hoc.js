@@ -6,16 +6,16 @@ import "../../assets/css/dashboardCSS/main.css";
 const Hoc = () => {
 
     const [sidebarHidden, setSidebarHidden] = useState(window.innerWidth < 770);
-    const [isDarkMode, setDarkMode] = useState(false);
+    // const [isDarkMode, setDarkMode] = useState(false);
 
     const toggleSidebar = () => {
         setSidebarHidden(!sidebarHidden);
     };
 
-    const toggleDarkMode = () => {
-        setDarkMode(!isDarkMode);
-        document.body.classList.toggle("dark");
-    };
+    // const toggleDarkMode = () => {
+    //     setDarkMode(!isDarkMode);
+    //     document.body.classList.toggle("dark");
+    // };
 
     useEffect(() => {
         const handleResize = () => {
@@ -31,7 +31,7 @@ const Hoc = () => {
     return (
         <>
             <Sidebar isOpen={!sidebarHidden} />
-            <Navbar toggleSidebar={toggleSidebar} toggleDarkMode={toggleDarkMode} />
+            <Navbar toggleSidebar={toggleSidebar} />
 
 
         </>

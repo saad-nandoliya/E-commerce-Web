@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../assets/css/dashboardCSS/navbar.css";
 import { NavLink } from "react-router-dom";
 
-const Navbar = ({ toggleSidebar, toggleDarkMode }) => {
+const Navbar = ({ toggleSidebar }) => {
   const [isSearchFormVisible, setSearchFormVisible] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -25,39 +25,39 @@ const Navbar = ({ toggleSidebar, toggleDarkMode }) => {
   return (
     <>
       <section id="content">
-        <nav>
-          <i className="bx bx-menu" onClick={toggleSidebar}></i>
-          <form>
-            <div className="form-input">
-              <input type="search" placeholder="Search..." />
-              <button
-                type="submit"
-                className="search-btn"
-                onClick={toggleSearchForm}
-              >
-                <i
-                  className={`bx ${isSearchFormVisible ? "bx-x" : "bx-search"}`}
-                ></i>
-              </button>
-            </div>
-          </form>
-          <input
-            type="checkbox"
-            id="switch-mode"
-            hidden
-            onChange={toggleDarkMode}
-          />
-          <label htmlFor="switch-mode" className="switch-mode"></label>
-          <NavLink to="/admin/dashboard" className="profile">
-            <img
-              src={require("../../assets/images/shopping.png")}
-              alt="user"
-            />
-          </NavLink>
+        <nav className="flex justify-between">
+          <div>
+            <i className="bx bx-menu" onClick={toggleSidebar}></i>
+          </div>
+          <div>
+            <form>
+              <div className="form-input">
+                <input type="search" placeholder="Search..." />
+                <button
+                  type="submit"
+                  className="search-btn"
+                  onClick={toggleSearchForm}
+                >
+                  <i
+                    className={`hidden sm:block bx ${isSearchFormVisible ? "bx-x" : "bx-search"}`}
+                  ></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <NavLink to="/admin/dashboard" className="profile">
+              <img
+                src={require("../../assets/images/shopping.png")}
+                alt="user"
+              />
+            </NavLink>
+          </div>
         </nav>
       </section>
     </>
   );
 };
 
-export default Navbar;
+export default Navbar;

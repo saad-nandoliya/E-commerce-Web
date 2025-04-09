@@ -11,7 +11,7 @@ const LogoutButton = () => {
 
             <button
                 onClick={handleLogout}
-                className="flex items-center space-x-4 p-2 "
+                className="flex items-center space-x-4 p-[13px] "
             >
                 <i className="bx bxs-log-out-circle text-red-600"></i>
                 <span>Logout</span>

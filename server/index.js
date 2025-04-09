@@ -10,7 +10,9 @@ const adminUser = require("./routes/loginRoute/adminLoginRoute")
 const product = require("./routes/pagesRoute/productPageRoute")
 const category = require("./routes/pagesRoute/categoryRoutePage")
 const CartItem = require("./routes/pagesRoute/cartItemRoutePage")
-
+const orderRoutes = require("./routes/paymentRoute/orderRoute");
+const paymentRoutes = require("./routes/paymentRoute/paymentRoute");
+const shippingRoutes = require("./routes/paymentRoute/shippingRoute");
 
 const app = express()
 const PORT = process.env.PORT
@@ -24,6 +26,9 @@ app.use("/", adminUser)
 app.use("/", product)
 app.use("/", category)
 app.use("/", CartItem)
+app.use("/", orderRoutes)
+app.use("/", paymentRoutes)
+app.use("/", shippingRoutes)
 
 
 
