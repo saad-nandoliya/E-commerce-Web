@@ -1,4 +1,4 @@
-const db = require("../../connection/Connection");
+const db = require("../../connection/connection");
 
 // Add or update cart item
 const addToCart = async (req, res) => {

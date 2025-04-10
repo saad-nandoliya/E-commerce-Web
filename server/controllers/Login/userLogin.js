@@ -1,4 +1,4 @@
-const db = require("../../connection/Connection");
+const db = require("../../connection/connection");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();

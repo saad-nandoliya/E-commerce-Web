@@ -1,5 +1,5 @@
 const path = require("path");
-const db = require("../../connection/Connection");
+const db = require("../../connection/connection");
 const fs = require("fs")
 
 const getAllProducts = (req, res) => {
