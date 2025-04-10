@@ -3,8 +3,10 @@ import { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
-const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API;
-const SendOTPAPI = process.env.REACT_APP_SEND_OTP_API;
+// const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API;
+// const SendOTPAPI = process.env.REACT_APP_SEND_OTP_API;
+const API = process.env.REACT_APP_API_URL;
+
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const SignUp = () => {
     }
 
     try {
-      const res = await axios.post(`${SendOTPAPI}`, { email_or_phone: userData.email_or_phone });
+      const res = await axios.post(`${API}/send-otp`, { email_or_phone: userData.email_or_phone });
 
       if (res.status === 200) {
         toast.success("OTP sent successfully!");
@@ -43,7 +45,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${UserRegisterAPI}`, userData);
+      const res = await axios.post(`${API}/register-new-user`, userData);
 
       if (res.status === 201) {
         setTimeout(() => toast.success(res.data.message), 1000);

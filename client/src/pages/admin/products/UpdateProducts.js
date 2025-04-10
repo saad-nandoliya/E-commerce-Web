@@ -7,9 +7,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 
-const updateAPI = process.env.REACT_APP_UPDATE_API;
-const CategoryAPI = process.env.REACT_APP_CATEGORY_API;
-const GetProByIdAPI = process.env.REACT_APP_GET_BY_ID_API;
+// const updateAPI = process.env.REACT_APP_UPDATE_API;
+// const CategoryAPI = process.env.REACT_APP_CATEGORY_API;
+// const GetProByIdAPI = process.env.REACT_APP_GET_BY_ID_API;
+const API = process.env.REACT_APP_API_URL;
 
 function UpdateProducts() {
     const [products, setProducts] = useState({
@@ -29,7 +30,7 @@ function UpdateProducts() {
     useEffect(() => {
         const fetchAllProducts = async () => {
             try {
-                const res = await axios.get(`${GetProByIdAPI}${id}`);
+                const res = await axios.get(`${API}/getproductsbyid/${id}`);
                 setProducts(res.data[0]);
             } catch (error) {
                 console.log("Error fetching products:", error);
@@ -41,7 +42,7 @@ function UpdateProducts() {
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                const res = await axios.get(CategoryAPI);
+                const res = await axios.get(`${API}/category`);
                 setData(res.data);
             } catch (error) {
                 console.log("Error fetching categories:", error);
@@ -81,7 +82,7 @@ function UpdateProducts() {
         formData.append("description", products.description);
 
         try {
-            const response = await axios.put(`${updateAPI}${id}`, formData, {
+            const response = await axios.put(`${API}/updateproducts/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

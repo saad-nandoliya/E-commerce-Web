@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../../context/cart";
 
-const BASE_URL = "http://localhost:4500"; // API base URL
+
+const API = process.env.REACT_APP_API_URL;
+
 
 const ProductsDetail = () => {
     const [product, setProduct] = useState(null);
@@ -22,7 +24,7 @@ const ProductsDetail = () => {
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`${BASE_URL}/getproductsbyid/${id}`);
+            const res = await axios.get(`${API}/getproductsbyid/${id}`);
             setProduct(res.data[0] || null);
         } catch (error) {
             console.error("Error fetching product:", error);

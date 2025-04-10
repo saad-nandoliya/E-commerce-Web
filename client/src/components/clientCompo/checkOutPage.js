@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { useCart } from "../../context/cart";
 import axios from "axios";
 
+
+const API = process.env.REACT_APP_API_URL;
+
+
 const CheckoutPage = () => {
     const { cart, totalAmount, setCart } = useCart();
     const [formData, setFormData] = useState({
@@ -45,7 +49,7 @@ const CheckoutPage = () => {
             return;
         }
 
-        const { data } = await axios.post("http://localhost:4500/createPaymentOrder", {
+        const { data } = await axios.post(`${API}/createPaymentOrder`, {
             amount: totalAmount,
         });
 
@@ -68,7 +72,7 @@ const CheckoutPage = () => {
                     shipping: formData,
                 };
 
-                await axios.post("http://localhost:4500/verifyPayment", paymentData);
+                await axios.post(`${API}/verifyPayment`, paymentData);
                 console.log("💳 Sending payment data:", paymentData);
                 setCart([]);
                 localStorage.removeItem("cart");
@@ -95,7 +99,7 @@ const CheckoutPage = () => {
                 payment_method: "cod",
             };
 
-            await axios.post("http://localhost:4500/verifyPayment", orderData);
+            await axios.post(`${API}/verifyPayment`, orderData);
             setCart([]);
             localStorage.removeItem("cart");
             alert("Order Placed Successfully with COD!");

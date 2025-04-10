@@ -8,14 +8,16 @@ export const useCategories = () => {
 };
 
 
-const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+// const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
+
 
 export const CategoryProvider = ({ children }) => {
     const [categories, setCategories] = useState([]);
 
     const fetchCategories = async () => {
         try {
-            const res = await axios.get(GetCategoryAPI);
+            const res = await axios.get(`${API}/category`);
             setCategories(res.data);
         } catch (error) {
             console.log("Error fetching categories:", error);

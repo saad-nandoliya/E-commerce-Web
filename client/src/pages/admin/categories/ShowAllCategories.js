@@ -7,8 +7,9 @@ import Hoc from "../../../components/dashboardCompo/Hoc";
 import DeleteModal from "../../../components/Modal/DeleteModal"
 
 
-const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
-const DeleteCategoryAPI = process.env.REACT_APP_DELETE_CATEGORY_API;
+// const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+// const DeleteCategoryAPI = process.env.REACT_APP_DELETE_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
 
 const ShowAllCategories = () => {
     const [product, setProduct] = useState([]);
@@ -22,7 +23,7 @@ const ShowAllCategories = () => {
 
     const fetchAllData = async () => {
         try {
-            const res = await axios.get(GetCategoryAPI);
+            const res = await axios.get(`${API}/category`);
             setProduct(res.data);
             console.log(res.data)
         } catch (error) {
@@ -39,7 +40,7 @@ const ShowAllCategories = () => {
         if (!selectedProductId) return;
 
         try {
-            await axios.delete(`${DeleteCategoryAPI}/${selectedProductId}`);
+            await axios.delete(`${API}/deletecategory/${selectedProductId}`);
             toast.success("Deleted successfully!");
             setModalOpen(false);
             setSelectedProductId(null);

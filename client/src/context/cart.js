@@ -11,7 +11,7 @@ export const CartProvider = ({ children }) => {
     });
 
     const user = localStorage.getItem("user_Id");
-    const BASE_URL = "http://localhost:4500";
+    const API = process.env.REACT_APP_API_URL;
 
     const hasSyncedCart = useRef(false); // ✅ Prevent multiple syncs
 
@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
 
                 if (localCart.length > 0) {
                     try {
-                        await axios.post(`${BASE_URL}/sync-cart-item`, {
+                        await axios.post(`${API}/sync-cart-item`, {
                             user_id: user,
                             cartItems: localCart,
                         });
@@ -37,7 +37,7 @@ export const CartProvider = ({ children }) => {
                 }
 
                 try {
-                    const { data } = await axios.get(`${BASE_URL}/get-cart-item/${user}`);
+                    const { data } = await axios.get(`${API}/get-cart-item/${user}`);
                     setCart(data);
                 } catch (error) {
                     console.error("Error fetching cart:", error);
@@ -75,12 +75,12 @@ export const CartProvider = ({ children }) => {
             });
         } else {
             try {
-                await axios.post(`${BASE_URL}/add-cart-item`, {
+                await axios.post(`${API}/add-cart-item`, {
                     user_id: user,
                     product_id: product.id,
                     quantity: 1,
                 });
-                const { data } = await axios.get(`${BASE_URL}/get-cart-item/${user}`);
+                const { data } = await axios.get(`${API}/get-cart-item/${user}`);
                 setCart(data);
             } catch (error) {
                 console.error("Error adding to cart:", error);
@@ -98,12 +98,12 @@ export const CartProvider = ({ children }) => {
             );
         } else {
             try {
-                await axios.put(`${BASE_URL}/update-cart-item`, {
+                await axios.put(`${API}/update-cart-item`, {
                     user_id: user,
                     product_id: id,
                     quantity: newQuantity,
                 });
-                const { data } = await axios.get(`${BASE_URL}/get-cart-item/${user}`);
+                const { data } = await axios.get(`${API}/get-cart-item/${user}`);
                 setCart(data);
             } catch (error) {
                 console.error("Error updating quantity:", error);
@@ -126,10 +126,10 @@ export const CartProvider = ({ children }) => {
             setCart((prevCart) => prevCart.filter((item) => item.id !== id));
         } else {
             try {
-                await axios.delete(`${BASE_URL}/delete-cart-item`, {
+                await axios.delete(`${API}/delete-cart-item`, {
                     data: { user_id: user, product_id: id },
                 });
-                const { data } = await axios.get(`${BASE_URL}/get-cart-item/${user}`);
+                const { data } = await axios.get(`${API}/get-cart-item/${user}`);
                 setCart(data);
             } catch (error) {
                 console.error("Error deleting item:", error);

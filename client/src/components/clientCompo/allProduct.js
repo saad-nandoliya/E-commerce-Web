@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import ProductCard from "./productCard";
 import axios from "axios";
 
-const getProductAPI = process.env.REACT_APP_GET_API;
+// const getProductAPI = process.env.REACT_APP_GET_API;
+const API = process.env.REACT_APP_API_URL;
+
 
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
@@ -16,7 +18,7 @@ const AllProducts = () => {
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`${getProductAPI}`);
+            const res = await axios.get(`${API}/getallproducts`);
             setProducts(res.data);
             setFilteredProducts(res.data);
         } catch (error) {

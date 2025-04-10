@@ -5,7 +5,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 
-const AddCategoryAPI = process.env.REACT_APP_ADD_CATEGORY_API;
+// const AddCategoryAPI = process.env.REACT_APP_ADD_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
 
 const AddCategory = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const AddCategory = () => {
         title: "",
     });
 
-    console.log(category)
+
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -35,7 +36,7 @@ const AddCategory = () => {
         formData.append("title", category.title);
 
         try {
-            axios.post(`${AddCategoryAPI}`, formData, {
+            axios.post(`${API}/addcategory`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

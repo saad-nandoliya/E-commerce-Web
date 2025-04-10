@@ -7,9 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 import DeleteModal from "../../../components/Modal/DeleteModal"
 
 
-const getAdminUserAPI = process.env.REACT_APP_GET_ADMIN_USER_API
-const deleteAdminUserAPI = process.env.REACT_APP_DELETE_ADMIN_USER_API
-const updateAdminStatus = process.env.REACT_APP_UPDATE_ADMIN_STATUS
+// const getAdminUserAPI = process.env.REACT_APP_GET_ADMIN_USER_API
+// const deleteAdminUserAPI = process.env.REACT_APP_DELETE_ADMIN_USER_API
+// const updateAdminStatus = process.env.REACT_APP_UPDATE_ADMIN_STATUS
+const API = process.env.REACT_APP_API_URL;
 
 const AllAdminUsers = () => {
     const [adminUsersData, setAdminUsersData] = useState([])
@@ -22,7 +23,7 @@ const AllAdminUsers = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get(getAdminUserAPI)
+            const res = await axios.get(`${API}/get-admin-user`)
             setAdminUsersData(res.data.results);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -37,7 +38,7 @@ const AllAdminUsers = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${deleteAdminUserAPI}/${selectedUserId}`);
+            await axios.delete(`${API}/delete-admin-user/${selectedUserId}`);
             toast.success("User deleted successfully!");
             setModalOpen(false);
             setSelectedUserId(null);
@@ -53,7 +54,7 @@ const AllAdminUsers = () => {
         const newStatus = currentStatus === "active" ? "inactive" : "active";
 
         try {
-            await axios.put(`${updateAdminStatus}/${id}`, { status: newStatus });
+            await axios.put(`${API}/update-admin-status/${id}`, { status: newStatus });
             toast.success(`Admin user status updated to ${newStatus}!`);
 
             fetchUsers();

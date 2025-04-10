@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+// const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
@@ -16,7 +17,7 @@ const Category = () => {
 
   const fetchAllData = async () => {
     try {
-      const res = await axios.get(GetCategoryAPI);
+      const res = await axios.get(`${API}/category`);
       setCategories(res.data);
     } catch (error) {
       console.log("Error fetching categories:", error);

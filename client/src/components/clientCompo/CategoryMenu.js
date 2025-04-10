@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 
-const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+// const GetCategoryAPI = process.env.REACT_APP_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
+
 
 const CategoryMenu = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -17,7 +19,7 @@ const CategoryMenu = () => {
 
   const fetchAllData = async () => {
     try {
-      const res = await axios.get(GetCategoryAPI);
+      const res = await axios.get(`${API}/category`);
       setCategories(res.data);
     } catch (error) {
       console.log("Error fetching categories:", error);

@@ -6,7 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
 
 
-const addAdminUserAPI = process.env.REACT_APP_ADD_ADMIN_USER_API
+// const addAdminUserAPI = process.env.REACT_APP_ADD_ADMIN_USER_API
+const API = process.env.REACT_APP_API_URL;
 
 const AddAdminUser = () => {
 
@@ -22,7 +23,7 @@ const AddAdminUser = () => {
         e.preventDefault();
         try {
 
-          const success =   await axios.post(`${addAdminUserAPI}`, addAdminUser)
+          const success =   await axios.post(`${API}/add-admin-user`, addAdminUser)
             setTimeout(() => {
                 if (success.status === 201) {
                     toast.success(success.data.message);

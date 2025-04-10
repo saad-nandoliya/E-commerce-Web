@@ -7,8 +7,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 
-const AddApi = process.env.REACT_APP_ADD_API;
-const CategoryApi = process.env.REACT_APP_CATEGORY_API;
+// const AddApi = process.env.REACT_APP_ADD_API;
+// const CategoryApi = process.env.REACT_APP_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
 
 const AddProduct = () => {
     const [products, setProducts] = useState({
@@ -26,7 +27,7 @@ const AddProduct = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get(CategoryApi);
+                const res = await axios.get(`${API}/category`);
                 setCategories(res.data);
             } catch (error) {
                 console.error("Error fetching categories:", error);
@@ -57,7 +58,7 @@ const AddProduct = () => {
 
         setErrors(newErrors);
 
-        return Object.keys(newErrors).length === 0; 
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
@@ -72,13 +73,13 @@ const AddProduct = () => {
         formData.append("description", products.description);
 
         try {
-            await axios.post(AddApi, formData, {
+            await axios.post(`${API}/addproducts`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-           setTimeout(() => {
-            toast.success("Product added successfully!");
-           }, 100)
+            setTimeout(() => {
+                toast.success("Product added successfully!");
+            }, 100)
             navigate("/admin/allproducts");
         } catch (error) {
             console.error("Error adding product:", error.response ? error.response.data : error.message);
@@ -95,7 +96,7 @@ const AddProduct = () => {
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
                                         Name <span className="text-red-500">*</span>

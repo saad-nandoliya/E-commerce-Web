@@ -5,8 +5,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Hoc from "../../../components/dashboardCompo/Hoc";
 
-const UpdateCategoryAPI = process.env.REACT_APP_UPDATE_CATEGORY_API;
-const GetCategoryByIdAPI = process.env.REACT_APP_GET_CATEGORY_BY_ID_API;
+// const UpdateCategoryAPI = process.env.REACT_APP_UPDATE_CATEGORY_API;
+// const GetCategoryByIdAPI = process.env.REACT_APP_GET_CATEGORY_BY_ID_API;
+const API = process.env.REACT_APP_API_URL;
 
 const UpdateCategory = () => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const UpdateCategory = () => {
     useEffect(() => {
         const fetchAllProducts = async () => {
             try {
-                const res = await axios.get(`${GetCategoryByIdAPI}${id}`);
+                const res = await axios.get(`${API}/getCategoryById/${id}`);
                 setCategory(res.data[0]);
             } catch (error) {
                 console.log("Error fetching products:", error);
@@ -53,7 +54,7 @@ const UpdateCategory = () => {
         formData.append("title", category.title);
 
         try {
-            const response = await axios.put(`${UpdateCategoryAPI}/${id}`, formData, {
+            const response = await axios.put(`${API}/updatecategory/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

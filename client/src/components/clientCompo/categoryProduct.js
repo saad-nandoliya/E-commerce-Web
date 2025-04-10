@@ -4,7 +4,9 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const getProductsByCategoryAPI = process.env.REACT_APP_GET_PRO_BY_CATEGORY_API;
+// const getProductsByCategoryAPI = process.env.REACT_APP_GET_PRO_BY_CATEGORY_API;
+const API = process.env.REACT_APP_API_URL;
+
 
 const CategoryList = () => {
   const [products, setProducts] = useState([]);
@@ -16,7 +18,7 @@ const CategoryList = () => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const res = await axios.get(`${getProductsByCategoryAPI}${category_id}`);
+        const res = await axios.get(`${API}/getproductsbycategory/${category_id}`);
         setProducts(res.data);
         setFiltered(res.data);
       } catch (error) {

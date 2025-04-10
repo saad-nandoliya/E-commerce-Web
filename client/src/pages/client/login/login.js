@@ -4,7 +4,8 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-const LoginAPI = process.env.REACT_APP_LOGIN_API;
+// const LoginAPI = process.env.REACT_APP_LOGIN_API;
+const API = process.env.REACT_APP_API_URL;
 
 const Login = () => {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const res = await axios.post(`${LoginAPI}`, formData);
+            const res = await axios.post(`${API}/login-user`, formData);
             if (!res.data.user) {
                 console.error("User missing from Login API response");
                 return;

@@ -3,7 +3,8 @@ import { FaArrowRight } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const getProductsAPI = process.env.REACT_APP_GET_API;
+// const getProductsAPI = process.env.REACT_APP_GET_API;
+const API = process.env.REACT_APP_API_URL;
 
 const Product = () => {
   const [product, setProduct] = useState([]);
@@ -15,7 +16,7 @@ const Product = () => {
 
   const fetchProduct = async () => {
     try {
-      const res = await axios.get(`${getProductsAPI}`);
+      const res = await axios.get(`${API}/getallproducts`);
       const randomProducts = getRandomItems(res.data, 6);
       setProduct(randomProducts);
     } catch (error) {

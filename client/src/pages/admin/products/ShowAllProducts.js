@@ -7,9 +7,9 @@ import Hoc from "../../../components/dashboardCompo/Hoc";
 import DeleteModal from "../../../components/Modal/DeleteModal"
 
 
-const getApi = process.env.REACT_APP_GET_API;
-const deleteApi = process.env.REACT_APP_DELETE_API;
-const StatusUpdate = process.env.REACT_APP_UPDATE_PRODUCT_STATUS_API;
+// const getApi = process.env.REACT_APP_GET_API;
+// const deleteApi = process.env.REACT_APP_DELETE_API;
+const API = process.env.REACT_APP_API_URL;
 
 const ShowProduct = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -26,7 +26,7 @@ const ShowProduct = () => {
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`${getApi}`);
+            const res = await axios.get(`${API}/getallproducts`);
             setProduct(res.data);
         } catch (error) {
             console.log(error);
@@ -42,7 +42,7 @@ const ShowProduct = () => {
     const confirmDelete = async () => {
 
         try {
-            await axios.delete(`${deleteApi}${selectedProductId}`);
+            await axios.delete(`${API}/deleteproducts/${selectedProductId}`);
             toast.success("Deleted successfully!");
 
             setModalOpen(false);
@@ -61,7 +61,7 @@ const ShowProduct = () => {
         const newStatus = currentStatus === "active" ? "inactive" : "active";
 
         try {
-            await axios.put(`${StatusUpdate}/${id}`, { status: newStatus });
+            await axios.put(`${API}/updatestatus/${id}`, { status: newStatus });
             toast.success(`Product status updated to ${newStatus}!`);
 
             fetchProduct();

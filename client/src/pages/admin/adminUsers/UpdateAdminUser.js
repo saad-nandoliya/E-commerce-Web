@@ -5,8 +5,9 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const updateAdminUserAPI = process.env.REACT_APP_UPDATE_ADMIN_USER_API;
-const getAdminUserByIdAPI = process.env.REACT_APP_ADMIN_USER_BY_ID_API;
+// const updateAdminUserAPI = process.env.REACT_APP_UPDATE_ADMIN_USER_API;
+// const getAdminUserByIdAPI = process.env.REACT_APP_ADMIN_USER_BY_ID_API;
+const API = process.env.REACT_APP_API_URL;
 
 const UpdateAdminUser = () => {
   const { id } = useParams();
@@ -21,7 +22,7 @@ const UpdateAdminUser = () => {
 
   const fetchAdminUser = async () => {
     try {
-      const res = await axios.get(`${getAdminUserByIdAPI}/${id}`);
+      const res = await axios.get(`${API}/get-admin-by-id/${id}`);
       setAdminUser(res.data[0]);
       console.log(res.data[0])
     } catch (error) {
@@ -45,7 +46,7 @@ const UpdateAdminUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${updateAdminUserAPI}/${id}`, adminUser, {
+      await axios.put(`${API}/update-admin-user/${id}`, adminUser, {
         headers: { "Content-Type": "application/json" },
       });
       setTimeout(() => {

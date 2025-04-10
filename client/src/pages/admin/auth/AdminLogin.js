@@ -2,7 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const AdminLoginApi = process.env.REACT_APP_LOGIN_ADMIN_USER_API;
+// const AdminLoginApi = process.env.REACT_APP_LOGIN_ADMIN_USER_API;
+const API = process.env.REACT_APP_API_URL;
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ const AdminLogin = () => {
 
    
     try {
-      const response = await axios.post(AdminLoginApi, formData);
+      const response = await axios.post(`${API}/login-admin-user`, formData);
       console.log("Login successful:", response.data);
 
       localStorage.setItem('isLogged', 'true');
