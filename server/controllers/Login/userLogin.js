@@ -1,5 +1,5 @@
 const db = require("../../connection/connection");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
