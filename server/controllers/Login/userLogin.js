@@ -72,17 +72,17 @@ const registerNewUser = async (req, res) => {
     otpStore.delete(email_or_phone); // Remove OTP after verification
 
     // Check if user exists
-    const checkUserQuery = "SELECT * FROM users WHERE username = ? OR email_or_phone = ?";
+    const checkUserQuery = "SELECT * FROM users WHERE username = $1 OR email_or_phone = $2";
     db.query(checkUserQuery, [username, email_or_phone], async (err, result) => {
       if (err) return res.status(500).json({ message: "Database error." });
-      if (result.length > 0) {
+      if (result.rows.length > 0) {
         return res.status(400).json({ message: "Username or Email already exists." });
       }
 
       // Hash password & insert user
       const hashPassword = await bcrypt.hash(password, 10);
       db.query(
-        "INSERT INTO users (username, email_or_phone, password, otp) VALUES (?, ?, ?, ?)",
+        "INSERT INTO users (username, email_or_phone, password, otp) VALUES ($1, $2, $3, $4)",
         [username, email_or_phone, hashPassword, otp],
         (err) => {
           if (err) return res.status(500).json({ message: "Database error occurred." });
@@ -104,12 +104,12 @@ const loginClientUser = async (req, res) => {
       return res.status(400).json({ message: "Email/phone and password are required." });
     }
 
-    const query = "SELECT * FROM users WHERE email_or_phone = ?";
+    const query = "SELECT * FROM users WHERE email_or_phone = $1";
     db.query(query, [email_or_phone], async (err, result) => {
       if (err) return res.status(500).json({ message: "Database error." });
-      if (result.length === 0) return res.status(401).json({ message: "Invalid credentials." });
+      if (result.rows.length === 0) return res.status(401).json({ message: "Invalid credentials." });
 
-      const user = result[0];
+      const user = result.rows[0];;
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials." });
