@@ -52,7 +52,7 @@ console.log(req.body)
 
         // Create order
         const [orderResult] = await db.query(
-            "INSERT INTO orders (user_id, total_amount) VALUES (?, ?)",
+            "INSERT INTO orders (user_id, total_amount) VALUES ($1, $2)",
             [user_id, amount]
         );
         const orderId = orderResult.insertId;
@@ -60,14 +60,14 @@ console.log(req.body)
         // Insert order items
         for (let item of cartItems) {
             await db.query(
-                "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)",
+                "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)",
                 [orderId, item.product_id, item.quantity, item.price]
             );
         }
 
         // Insert shipping
         await db.query(
-            "INSERT INTO shipping (user_id, address, city, state, country, zip_code, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO shipping (user_id, address, city, state, country, zip_code, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             [
                 user_id,
                 shipping.address,
@@ -81,7 +81,7 @@ console.log(req.body)
 
         // Insert payment
         await db.query(
-            "INSERT INTO payment (order_id, user_id, payment_method, payment_status, transaction_id, amount) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO payment (order_id, user_id, payment_method, payment_status, transaction_id, amount) VALUES ($1, $2, $3, $4, $5, $6)",
             [
                 orderId,
                 user_id,

@@ -16,7 +16,7 @@ const getAllProducts = (req, res) => {
 
 const getProductsById = (req, res) => {
   const id = req.params.id;
-  const q = "SELECT * FROM products WHERE id =?";
+  const q = "SELECT * FROM products WHERE id =$1";
   db.query(q, id, (err, result) => {
     if (err) {
       return res.status(500);
@@ -30,7 +30,7 @@ const addProducts = (req, res) => {
   const image = req.file ? req.file.filename : null;
 
   const q =
-    "INSERT INTO products (name, price, description, image, status,  category_id) VALUES (?,?,?,?,?,?)";
+    "INSERT INTO products (name, price, description, image, status,  category_id) VALUES ($1, $2, $3, $4, $5, $6)";
 
   const values = [name, price, description, image, "active", category_id];
 
@@ -52,7 +52,7 @@ const updateProducts = (req, res) => {
   const { name, price,description, category_id } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
-  const selectQuery = "SELECT image FROM products WHERE id = ?";
+  const selectQuery = "SELECT image FROM products WHERE id = $1";
   db.query(selectQuery, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
@@ -68,7 +68,7 @@ const updateProducts = (req, res) => {
     }
 
 
-    const updateQuery = "UPDATE products SET name =?, price =?, description =?, category_id=?, image=? WHERE id =?";
+    const updateQuery = "UPDATE products SET name =$1, price =$2, description =$3, category_id=$4, image=$5 WHERE id =$6";
     const values = [name, price, description, category_id, newImage || oldImage, id];
     db.query(updateQuery, values, (err, result) => {
       if (err) return res.status(500).json({ message: "Error updating product" });
@@ -82,7 +82,7 @@ const updateProducts = (req, res) => {
 
 const deleteProducts = (req, res) => {
   const id = req.params.id;
-  const selectImage = "SELECT image FROM products WHERE id = ?";
+  const selectImage = "SELECT image FROM products WHERE id = $1";
   db.query(selectImage, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
@@ -95,7 +95,7 @@ const deleteProducts = (req, res) => {
       });
     }
 
-    const q = "DELETE FROM products WHERE id =?";
+    const q = "DELETE FROM products WHERE id =$1";
     db.query(q, id, (err, result) => {
       if (err) {
         return res.status(500);
@@ -107,7 +107,7 @@ const deleteProducts = (req, res) => {
 
 const getProductsByCategory = (req, res) => {
   const category = req.params.id;
-  const q = "SELECT * FROM products WHERE category_id = ?";
+  const q = "SELECT * FROM products WHERE category_id = $1";
   db.query(q, [category], (err, result) => {
     if (err) {
       console.log(err);
@@ -124,7 +124,7 @@ const updateStatus = (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const query = "UPDATE products SET status = ? WHERE id = ?";
+  const query = "UPDATE products SET status = $1 WHERE id = $2";
   db.query(query, [status, id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     return res.json({ message: "Products status updated successfully!" });

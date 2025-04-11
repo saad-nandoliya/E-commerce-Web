@@ -13,7 +13,7 @@ const addAdminUser = async (req, res) => {
                 .json({ message: "Username, email, and password are required." });
         }
 
-        const checkEmail = "SELECT * FROM `admin_users` WHERE username = ? OR email = ?"
+        const checkEmail = "SELECT * FROM `admin_users` WHERE username = $1 OR email = $2"
         db.query(checkEmail, [username, email], async (err, result) => {
             if (err) {
                 console.error("Database error:", err.message);
@@ -26,7 +26,7 @@ const addAdminUser = async (req, res) => {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const sqlQuery = "INSERT INTO `admin_users` (username, status, email, password) VALUES (?, ?, ?, ?)";
+            const sqlQuery = "INSERT INTO `admin_users` (username, status, email, password) VALUES ($1, $2, $3, $4)";
             const data = [username, "active", email, hashedPassword];
 
             db.query(sqlQuery, data, (err) => {
@@ -55,7 +55,7 @@ const loginAdminUser = async (req, res) => {
             return res.status(400).json({ message: "Email and password are required." });
         }
 
-        const sql = "SELECT * FROM `admin_users` WHERE email = ?";
+        const sql = "SELECT * FROM `admin_users` WHERE email = $1";
 
         db.query(sql, [email], async (err, results) => {
             if (err) {
@@ -103,7 +103,7 @@ const getAdminUsers = (req, res) => {
 // ==================================== (delete users api) ====================================
 const deleteAdminUser = (req, res) => {
     const id = req.params.id;
-    const q = "DELETE FROM admin_users WHERE id =?";
+    const q = "DELETE FROM admin_users WHERE id = $1";
     db.query(q, id, (err) => {
         if (err) {
             return res.status(500);
@@ -121,7 +121,7 @@ const updateAdminUser = async (req, res) => {
     
     const hashedPassword = await bcrypt.hash(password, 10);
     const sqlQuery =
-    "UPDATE admin_users SET username = ?, email = ?, password = ? WHERE id = ?";
+    "UPDATE admin_users SET username = $1, email = $2, password = $3 WHERE id = $4";
     const data = [username, email, hashedPassword, id];
     
     db.query(sqlQuery, data, (err) => {
@@ -142,7 +142,7 @@ const updateAdminUser = async (req, res) => {
 // ==================================== (get user by id api) ====================================
 const getAdminUsersById = (req, res) => {
     const { id } = req.params;
-    const sqlQuery = "SELECT * FROM admin_users WHERE id = ?";
+    const sqlQuery = "SELECT * FROM admin_users WHERE id = $1";
     db.query(sqlQuery, [id], (err, results) => {
         if (err) {
             return res.status(500).json({ error: "Database query error" });
@@ -158,7 +158,7 @@ const updateAdminStatus = (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
   
-    const query = "UPDATE admin_users SET status = ? WHERE id = ?";
+    const query = "UPDATE admin_users SET status = $1 WHERE id = $2";
     db.query(query, [status, id], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       return res.json({ message: "Products status updated successfully!" });

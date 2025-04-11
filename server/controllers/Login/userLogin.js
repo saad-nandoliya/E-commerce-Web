@@ -18,6 +18,7 @@ const transporter = nodemailer.createTransport({
 const sendOtp = async (req, res) => {
   try {
     const { email_or_phone } = req.body;
+    console.log(req.body)
     if (!email_or_phone) {
       return res.status(400).json({ message: "Email is required." });
     }
@@ -100,6 +101,7 @@ const registerNewUser = async (req, res) => {
 const loginClientUser = async (req, res) => {
   try {
     const { email_or_phone, password } = req.body;
+    console.log(req.body)
     if (!email_or_phone || !password) {
       return res.status(400).json({ message: "Email/phone and password are required." });
     }

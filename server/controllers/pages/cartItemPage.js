@@ -9,7 +9,7 @@ const addToCart = async (req, res) => {
     }
 
     try {
-        const checkSql = "SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?";
+        const checkSql = "SELECT quantity FROM cart_items WHERE user_id = $1 AND product_id = $2";
         const existingItem = await new Promise((resolve, reject) => {
             db.query(checkSql, [user_id, product_id], (err, result) => {
                 if (err) reject(err);
@@ -19,7 +19,7 @@ const addToCart = async (req, res) => {
 
         if (existingItem.length > 0) {
             const newQuantity = existingItem[0].quantity + quantity;
-            const updateSql = "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?";
+            const updateSql = "UPDATE cart_items SET quantity = $1 WHERE user_id = $2 AND product_id = $3";
             await new Promise((resolve, reject) => {
                 db.query(updateSql, [newQuantity, user_id, product_id], (err, result) => {
                     if (err) reject(err);
@@ -27,7 +27,7 @@ const addToCart = async (req, res) => {
                 });
             });
         } else {
-            const insertSql = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)";
+            const insertSql = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES ($1, $2, $3)";
             await new Promise((resolve, reject) => {
                 db.query(insertSql, [user_id, product_id, quantity], (err, result) => {
                     if (err) reject(err);
@@ -56,7 +56,7 @@ const getCartItems = async (req, res) => {
             SELECT ci.product_id AS id, ci.quantity, p.name, p.price, p.image
             FROM cart_items ci
             JOIN products p ON ci.product_id = p.id
-            WHERE ci.user_id = ?
+            WHERE ci.user_id = $1
         `;
         db.query(sql, [user_id], (err, result) => {
             if (err) {
@@ -78,7 +78,7 @@ const deleteCart = async (req, res) => {
         return res.status(400).json({ error: "User ID aur Product ID zaroori hain" });
     }
     try {
-        const sql = "DELETE FROM cart_items WHERE user_id = ? AND product_id = ?";
+        const sql = "DELETE FROM cart_items WHERE user_id = $1 AND product_id = $1";
         await db.query(sql, [user_id, product_id]);
         res.status(200).json({ message: "Cart item delete ho gaya" });
     } catch (error) {
@@ -96,7 +96,7 @@ const updateCartQuantity = async (req, res) => {
     }
 
     try {
-        const sql = "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?";
+        const sql = "UPDATE cart_items SET quantity = $1 WHERE user_id = $2 AND product_id = $3";
         db.query(sql, [quantity, user_id, product_id], (err, result) => {
             if (err) {
                 console.error("Error updating quantity:", err);
@@ -125,7 +125,7 @@ const syncCart = async (req, res) => {
 
             const existingItem = await new Promise((resolve, reject) => {
                 db.query(
-                    "SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?",
+                    "SELECT quantity FROM cart_items WHERE user_id = $1 AND product_id = $2",
                     [user_id, product_id],
                     (err, result) => {
                         if (err) reject(err);
@@ -138,7 +138,7 @@ const syncCart = async (req, res) => {
                 // Replace the existing quantity with the local storage quantity
                 await new Promise((resolve, reject) => {
                     db.query(
-                        "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?",
+                        "UPDATE cart_items SET quantity = $1 WHERE user_id = $2 AND product_id = $3",
                         [quantity, user_id, product_id],
                         (err, result) => {
                             if (err) reject(err);
@@ -150,7 +150,7 @@ const syncCart = async (req, res) => {
                 // Insert new item if it doesn't exist
                 await new Promise((resolve, reject) => {
                     db.query(
-                        "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)",
+                        "INSERT INTO cart_items (user_id, product_id, quantity) VALUES ($1, $2, $3)",
                         [user_id, product_id, quantity],
                         (err, result) => {
                             if (err) reject(err);

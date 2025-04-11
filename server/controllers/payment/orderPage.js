@@ -6,7 +6,7 @@ createOrder = async (req, res) => {
     try {
         // Create Order
         const [orderResult] = await db.query(
-            "INSERT INTO orders (user_id, total_amount) VALUES (?, ?)",
+            "INSERT INTO orders (user_id, total_amount) VALUES ($1, $2)",
             [user_id, total_amount]
         );
         const orderId = orderResult.insertId;
@@ -14,7 +14,7 @@ createOrder = async (req, res) => {
         // Add Order Items
         for (let item of cartItems) {
             await db.query(
-                "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)",
+                "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)",
                 [orderId, item.product_id, item.quantity, item.price]
             );
         }
