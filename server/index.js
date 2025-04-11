@@ -18,7 +18,10 @@ const app = express()
 const PORT = process.env.PORT
 const URL = process.env.URL
 
-app.use(cors())
+app.use(cors({
+    origin: 'https://e-commerce-web-1-6t8c.onrender.com',
+    credentials: true
+}));
 app.use(express.json())
 app.use(bodyparser.json())
 app.use("/", userLogin)
