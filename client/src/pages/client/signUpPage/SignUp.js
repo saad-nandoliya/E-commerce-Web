@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 // const UserRegisterAPI = process.env.REACT_APP_USER_REGISTER_API;
 // const SendOTPAPI = process.env.REACT_APP_SEND_OTP_API;
 const API = process.env.REACT_APP_API_URL;
-
+console.log(API)
 
 const SignUp = () => {
   const navigate = useNavigate();

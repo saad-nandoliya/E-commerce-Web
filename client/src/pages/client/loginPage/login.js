@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // const LoginAPI = process.env.REACT_APP_LOGIN_API;
 const API = process.env.REACT_APP_API_URL;
-
+console.log(API)
 const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
