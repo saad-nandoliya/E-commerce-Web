@@ -141,6 +141,7 @@ export const CartProvider = ({ children }) => {
         (acc, item) => acc + item.price * item.quantity,
         0
     );
+    
     const totalItems = cart.length;
 
     return (
