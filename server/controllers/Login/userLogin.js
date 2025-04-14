@@ -86,6 +86,7 @@ const registerNewUser = async (req, res) => {
         "INSERT INTO users (username, email_or_phone, password, otp) VALUES ($1, $2, $3, $4)",
         [username, email_or_phone, hashPassword, otp],
         (err) => {
+          console.error("Insert error:", err);
           if (err) return res.status(500).json({ message: "Database error occurred." });
           return res.status(201).json({ message: "User registered successfully." });
         }
