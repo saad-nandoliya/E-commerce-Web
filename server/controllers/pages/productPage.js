@@ -8,7 +8,7 @@ const getAllProducts = (req, res) => {
     if (err) {
       return res.status(500);
     }
-    return res.json(result);
+    return res.json(result.rows);
   });
 };
 
@@ -21,7 +21,7 @@ const getProductsById = (req, res) => {
     if (err) {
       return res.status(500);
     }
-    return res.json(result);
+    return res.json(result.rows);
   });
 };
 
@@ -42,7 +42,7 @@ const addProducts = (req, res) => {
     return res.json({
       success: true,
       message: "Product added successfully",
-      data,
+      data: result.rows[0],
     });
   });
 };
@@ -56,7 +56,7 @@ const updateProducts = (req, res) => {
   db.query(selectQuery, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
-    const oldImage = data[0]?.image;
+    const oldImage = data.rows[0]?.image;
 
     if (newImage && oldImage) {
       const oldImagePath = path.join(__dirname, "../../../client/public/uploads/productImage", oldImage);
@@ -86,7 +86,7 @@ const deleteProducts = (req, res) => {
   db.query(selectImage, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
-    const imageName = data[0]?.image;
+    const imageName = data.rows[0]?.image;
     if (imageName) {
       const imagePath = path.join(__dirname, "../../../client/public/uploads/productImage", imageName);
 
@@ -113,7 +113,7 @@ const getProductsByCategory = (req, res) => {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send(result);
+      res.send(result.rows);
     }
   });
 };

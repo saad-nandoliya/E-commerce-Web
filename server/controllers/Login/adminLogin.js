@@ -20,7 +20,7 @@ const addAdminUser = async (req, res) => {
                 return res.status(500).json({ message: "Database error. Try again later." });
             }
 
-            if (result.length > 0) {
+            if (result.rows.length > 0) {
                 return res.status(400).json({ message: "Username Or Email already exists. Try another one!" });
             }
 
@@ -63,11 +63,11 @@ const loginAdminUser = async (req, res) => {
                 return res.status(500).json({ message: "Server error" });
             }
 
-            if (results.length === 0) {
+            if (results.rows.length  === 0) {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
 
-            const user = results[0];
+            const user = results.rows[0];
 
             if (user.status === "inactive") {
                 return res.status(403).json({ message: "Your account is inactive. Please contact support." });
@@ -95,7 +95,7 @@ const getAdminUsers = (req, res) => {
         if (err) {
             return res.status(500).json({ error: "Database query error" });
         }
-        res.json({ results });
+        res.json({ results: results.rows });
     });
 };
 
@@ -147,7 +147,7 @@ const getAdminUsersById = (req, res) => {
         if (err) {
             return res.status(500).json({ error: "Database query error" });
         }
-        res.json(results);
+        res.json(results.rows);
     });
 };
 

@@ -17,8 +17,8 @@ const addToCart = async (req, res) => {
             });
         });
 
-        if (existingItem.length > 0) {
-            const newQuantity = existingItem[0].quantity + quantity;
+        if (existingItem.rows.length > 0) {
+            const newQuantity = existingItem.rows[0].quantity + quantity;
             const updateSql = "UPDATE cart_items SET quantity = $1 WHERE user_id = $2 AND product_id = $3";
             await new Promise((resolve, reject) => {
                 db.query(updateSql, [newQuantity, user_id, product_id], (err, result) => {
@@ -63,7 +63,7 @@ const getCartItems = async (req, res) => {
                 console.error("Error fetching cart items:", err);
                 return res.status(500).json({ error: "Internal server error" });
             }
-            res.status(200).json(result);
+            res.status(200).json(result.rows);
         });
     } catch (error) {
         console.error("Error:", error);
@@ -78,7 +78,7 @@ const deleteCart = async (req, res) => {
         return res.status(400).json({ error: "User ID aur Product ID zaroori hain" });
     }
     try {
-        const sql = "DELETE FROM cart_items WHERE user_id = $1 AND product_id = $1";
+        const sql = "DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2";
         await db.query(sql, [user_id, product_id]);
         res.status(200).json({ message: "Cart item delete ho gaya" });
     } catch (error) {
@@ -134,7 +134,7 @@ const syncCart = async (req, res) => {
                 );
             });
 
-            if (existingItem.length > 0) {
+            if (existingItem.rows.length > 0) {
                 // Replace the existing quantity with the local storage quantity
                 await new Promise((resolve, reject) => {
                     db.query(
