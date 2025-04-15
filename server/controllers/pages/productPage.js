@@ -39,17 +39,13 @@ const addProducts = (req, res) => {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Internal Server Error" });
     }
-    return res.json({
-      success: true,
-      message: "Product added successfully",
-      data: data.rows[0],
-    });
+    return res.json({message: "Product added successfully",});
   });
 };
 
 const updateProducts = (req, res) => {
   const id = req.params.id;
-  const { name, price,description, category_id } = req.body;
+  const { name, price, description, category_id } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
   const selectQuery = "SELECT image FROM products WHERE id = $1";
