@@ -34,15 +34,13 @@ const addProducts = (req, res) => {
 
   const values = [name, price, description, image, "active", category_id];
 
-  db.query(q, values, (err, data) => {
+  db.query(q, values, (err) => {
     if (err) {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Internal Server Error" });
     }
     return res.json({
-      success: true,
       message: "Product added successfully",
-      data: result.rows[0],
     });
   });
 };

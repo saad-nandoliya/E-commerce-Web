@@ -112,7 +112,7 @@ const ShowProduct = () => {
                                         <td className="px-4 py-3 text-center">{item.category_id}</td>
                                         <td className="px-4 py-3 flex justify-center">
                                             <img
-                                                src={`/uploads/productImage/${item.image}`}
+                                                src={`${API}/uploads/productImage/${item.image}`}
                                                 alt="product"
                                                 className="w-10 h-10 rounded-full border border-gray-300"
                                             />
