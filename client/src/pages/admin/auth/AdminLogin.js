@@ -40,7 +40,7 @@ const AdminLogin = () => {
       navigate("/admin/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMessage(error.response.data.message);
+      setErrorMessage(error.response?.data?.message);
     }
   };
 

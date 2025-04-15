@@ -31,13 +31,13 @@ const ProductsDetail = () => {
         }
     };
 
-    if (!product) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                Loading...
-            </div>
-        );
-    }
+    // if (!product) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center">
+    //             Loading...
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">

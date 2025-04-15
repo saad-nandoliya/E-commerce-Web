@@ -1,6 +1,7 @@
 const express = require("express")
 const bodyparser = require("body-parser")
 const cors = require("cors")
+const path = require("path")
 const dotenv = require("dotenv")
 dotenv.config()
 
@@ -18,12 +19,18 @@ const app = express()
 const PORT = process.env.PORT
 const URL = process.env.URL
 
+
+
 app.use(cors({
     origin: 'https://e-commerce-web-1-6t8c.onrender.com',
     credentials: true
 }));
 app.use(express.json())
 app.use(bodyparser.json())
+app.use("/uploads", express.static(path.join(__dirname, "../client/public/uploads")));
+
+
+
 app.use("/", userLogin)
 app.use("/", adminUser)
 app.use("/", product)
