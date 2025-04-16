@@ -1,4 +1,3 @@
-// server/middleware/cloudinary.js
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
@@ -10,25 +9,18 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-const productStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "productImage", // Cloudinary folder
-    allowed_formats: ["jpg", "png", "jpeg"],
-    public_id: (req, file) => Date.now() + "-" + file.originalname,
-  },
-});
+const createStorage = (folderName) =>
+  new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: folderName,
+      allowed_formats: ["jpg", "png", "jpeg"],
+      public_id: (req, file) => Date.now() + "-" + file.originalname,
+    },
+  });
 
-const categoryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "categoryImage",
-    allowed_formats: ["jpg", "png", "jpeg"],
-    public_id: (req, file) => Date.now() + "-" + file.originalname,
-  },
-});
+const productLocation = multer({ storage: createStorage("productImage") });
+const categoryLocation = multer({ storage: createStorage("categoryImage") });
 
-const productLocation = multer({ storage: productStorage });
-const categoryLocation = multer({ storage: categoryStorage });
 
 module.exports = {productLocation, categoryLocation};
