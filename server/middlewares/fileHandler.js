@@ -1,16 +1,34 @@
-const multer = require("multer")
-const path = require("path")
+// server/middleware/cloudinary.js
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+require("dotenv").config();
 
-const getStorage = (folderName) => multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, `../../client/public/uploads/${folderName}`));
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
-    }
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
-const productLocation = multer({ storage: getStorage("productImage") });
-const categoryLocation = multer({ storage: getStorage("categoryImage") });
+const productStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "productImage", // Cloudinary folder
+    allowed_formats: ["jpg", "png", "jpeg"],
+    public_id: (req, file) => Date.now() + "-" + file.originalname,
+  },
+});
+
+const categoryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "categoryImage",
+    allowed_formats: ["jpg", "png", "jpeg"],
+    public_id: (req, file) => Date.now() + "-" + file.originalname,
+  },
+});
+
+const productLocation = multer({ storage: productStorage });
+const categoryLocation = multer({ storage: categoryStorage });
 
 module.exports = {productLocation, categoryLocation};

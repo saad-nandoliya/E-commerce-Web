@@ -1,6 +1,6 @@
 const path = require("path");
 const db = require("../../connection/connection");
-const fs = require("fs")
+const cloudinary = require("cloudinary").v2;
 
 const getAllProducts = (req, res) => {
   const q = "SELECT * FROM products";
@@ -52,20 +52,18 @@ const updateProducts = (req, res) => {
   db.query(selectQuery, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
-    const oldImage = data.rows[0]?.image;
+    const oldImageUrl = data.rows[0]?.image;
 
-    if (newImage && oldImage) {
-      const oldImagePath = path.join(__dirname, "../../../client/public/uploads/productImage", oldImage);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlink(oldImagePath, (err) => {
-          if (err) console.error("Error deleting old image:", err);
-        });
-      }
+    if (newImage && oldImageUrl) {
+      const publicId = oldImageUrl.split("/").pop().split(".")[0];
+      cloudinary.uploader.destroy(`productImage/${publicId}`, (err) => {
+        if (err) console.error("Error deleting old image from Cloudinary:", err);
+      });
     }
 
 
     const updateQuery = "UPDATE products SET name =$1, price =$2, description =$3, category_id=$4, image=$5 WHERE id =$6";
-    const values = [name, price, description, category_id, newImage || oldImage, id];
+    const values = [name, price, description, category_id, newImage || oldImageUrl, id];
     db.query(updateQuery, values, (err, result) => {
       if (err) return res.status(500).json({ message: "Error updating product" });
 
@@ -82,12 +80,11 @@ const deleteProducts = (req, res) => {
   db.query(selectImage, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
-    const imageName = data.rows[0]?.image;
-    if (imageName) {
-      const imagePath = path.join(__dirname, "../../../client/public/uploads/productImage", imageName);
-
-      fs.unlink(imagePath, (err) => {
-        if (err) console.error("Error deleting image:", err);
+    const imageUrl = data.rows[0]?.image;
+    if (imageUrl) {
+      const publicId = imageUrl.split("/").pop().split(".")[0];
+      cloudinary.uploader.destroy(`productImage/${publicId}`, (err) => {
+        if (err) console.error("Error deleting product image from Cloudinary:", err);
       });
     }
 

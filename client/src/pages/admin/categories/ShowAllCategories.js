@@ -93,7 +93,7 @@ const ShowAllCategories = () => {
                                         <td className="px-4 py-3 text-center">{item.id}</td>
                                         <td className="px-4 py-3 flex justify-center">
                                             <img
-                                                src={`/uploads/categoryImage/${item.image}`}
+                                                src={item.image}
                                                 alt={item.title}
                                                 className="w-10 h-10 rounded-full border border-gray-300"
                                             />

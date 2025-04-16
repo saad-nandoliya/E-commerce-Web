@@ -1,6 +1,6 @@
 const path = require("path");
 const db = require("../../connection/connection");
-const fs = require("fs")
+const cloudinary = require("cloudinary").v2;
 
 const getCategories = (req, res) => {
   db.query("SELECT * FROM categories", (err, result) => {
@@ -38,21 +38,19 @@ const updateCategory = (req, res) => {
   db.query(selectQuery, [id], (err, data) => {
     if (err) return res.status(500).json({ message: "Database Error" });
 
-    const oldImage = data.rows[0]?.image;
+    const oldImageUrl = data.rows[0]?.image;
 
 
-    if (newImage && oldImage) {
-      const oldImagePath = path.join(__dirname, "../../../client/public/uploads/categoryImage", oldImage);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlink(oldImagePath, (err) => {
-          if (err) console.error("Error deleting old image:", err);
-        });
-      }
+    if (newImage && oldImageUrl) {
+      const publicId = oldImageUrl.split("/").pop().split(".")[0]; // extract public_id
+      cloudinary.uploader.destroy(`categoryImage/${publicId}`, (err, result) => {
+        if (err) console.error("Cloudinary deletion error:", err);
+      });
     }
 
 
     const updateQuery = "UPDATE categories SET title =$1, image =$2 WHERE id =$3";
-    const values = [title, newImage || oldImage, id]; 
+    const values = [title, newImage || oldImageUrl, id]; 
 
     db.query(updateQuery, values, (err) => {
       if (err) return res.status(500).json({ message: "Error updating category" });
@@ -84,9 +82,9 @@ const deleteCategory = (req, res) => {
 
 
     productData.rows.forEach((product) => {
-      const imagePath = path.join(__dirname, "../../../client/public/uploads/productImage", product.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlink(imagePath, (err) => {
+      if (product.image) {
+        const publicId = product.image.split("/").pop().split(".")[0];
+        cloudinary.uploader.destroy(`productImage/${publicId}`, (err) => {
           if (err) console.error("Error deleting product image:", err);
         });
       }
@@ -97,13 +95,11 @@ const deleteCategory = (req, res) => {
     db.query(selectImage, [id], (err, data) => {
       if (err) return res.status(500).json({ message: "Database Error" });
 
-      const imageName = data.rows[0]?.image;
-      if (imageName) {
-        const imagePath = path.join(__dirname, "../../../client/public/uploads/categoryImage", imageName);
-
-
-        fs.unlink(imagePath, (err) => {
-          if (err) console.error("Error deleting image:", err);
+      const imageUrl = data.rows[0]?.image;
+      if (imageUrl) {
+        const publicId = imageUrl.split("/").pop().split(".")[0];
+        cloudinary.uploader.destroy(`categoryImage/${publicId}`, (err) => {
+          if (err) console.error("Error deleting category image:", err);
         });
       }
 
