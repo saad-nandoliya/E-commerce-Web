@@ -13,7 +13,7 @@ const addAdminUser = async (req, res) => {
                 .json({ message: "Username, email, and password are required." });
         }
 
-        const checkEmail = "SELECT * FROM `admin_users` WHERE username = $1 OR email = $2"
+        const checkEmail = "SELECT * FROM admin_users WHERE username = $1 OR email = $2"
         db.query(checkEmail, [username, email], async (err, result) => {
             if (err) {
                 console.error("Database error:", err.message);
