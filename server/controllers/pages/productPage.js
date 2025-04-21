@@ -15,7 +15,7 @@ const getAllProducts = (req, res) => {
 const getProductsById = (req, res) => {
   const id = req.params.id;
   const q = "SELECT * FROM products WHERE id =$1";
-  db.query(q, id, (err, result) => {
+  db.query(q, [id], (err, result) => {
     if (err) {
       return res.status(500).json({ message: "Database Error", error: err.message });
     }
