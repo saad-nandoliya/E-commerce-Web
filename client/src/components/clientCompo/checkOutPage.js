@@ -60,7 +60,7 @@ const CheckoutPage = () => {
           });
       
           const options = {
-            key: process.env.REACT_APP_RAZORPAY_KEY, // or use directly like "rzp_test_..."
+            key: "rzp_test_0PsAonKB4n1Cpe", // or use directly like "rzp_test_..."
             amount: data.amount,
             currency: "INR",
             name: "E-com",
