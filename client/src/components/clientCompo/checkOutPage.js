@@ -48,7 +48,7 @@ const CheckoutPage = () => {
       });
 
       const options = {
-        key: "rzp_test_sXWDKsuDaX1kkN", // Razorpay Key ID
+        key: "rzp_test_0PsAonKB4n1Cpe", // Razorpay Key ID
         amount: razorpayOrder.amount,
         currency: "INR",
         name: "E-com",
