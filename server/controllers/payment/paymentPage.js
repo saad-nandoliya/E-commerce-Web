@@ -1,8 +1,7 @@
 const db = require("../../connection/connection");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-require("dotenv").config()
-
+require("dotenv").config();
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -10,17 +9,23 @@ const razorpay = new Razorpay({
 });
 
 // Create Razorpay order
-const createPaymentOrder = async (req, res) => {
+createPaymentOrder = async (req, res) => {
     const { amount } = req.body;
 
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+    }
+
     try {
+        console.log("Creating Razorpay order with amount:", amount);
         const options = {
-            amount: amount * 100,
+            amount: amount * 100, // Convert to paise
             currency: "INR",
             receipt: `receipt_${Date.now()}`,
         };
 
         const order = await razorpay.orders.create(options);
+        console.log("Razorpay order created:", order);
         res.status(200).json({ orderId: order.id, amount: order.amount });
     } catch (err) {
         console.error("Error creating Razorpay order:", err);
@@ -29,9 +34,10 @@ const createPaymentOrder = async (req, res) => {
 };
 
 // Verify payment and save order
-const verifyPayment = async (req, res) => {
+verifyPayment = async (req, res) => {
     const { order_id, user_id, payment_method, payment_id, signature, amount, cartItems, shipping } = req.body;
-console.log(req.body)
+    console.log("Received payment verification data:", req.body);
+
     try {
         let verified = false;
 
@@ -39,23 +45,23 @@ console.log(req.body)
             verified = true;
         } else {
             const expectedSignature = crypto
-                .createHmac("sha256", "YOUR_SECRET")
+                .createHmac("sha256", process.env.RAZORPAY_SECRET)
                 .update(`${order_id}|${payment_id}`)
                 .digest("hex");
 
-            if (expectedSignature === signature) {
-                verified = true;
-            }
+            verified = expectedSignature === signature;
         }
 
-        if (!verified) return res.status(400).json({ error: "Payment verification failed" });
+        if (!verified) {
+            return res.status(400).json({ error: "Payment verification failed" });
+        }
 
         // Create order
-        const [orderResult] = await db.query(
-            "INSERT INTO orders (user_id, total_amount) VALUES ($1, $2)",
+        const orderResult = await db.query(
+            "INSERT INTO orders (user_id, total_amount) VALUES ($1, $2) RETURNING id",
             [user_id, amount]
         );
-        const orderId = orderResult.insertId;
+        const orderId = orderResult.rows[0].id;
 
         // Insert order items
         for (let item of cartItems) {
@@ -97,6 +103,10 @@ console.log(req.body)
         console.error("Error verifying payment:", err);
         res.status(500).json({ error: "Failed to process order" });
     }
-};
+}; 
 
-module.exports = { createPaymentOrder, verifyPayment };
+
+module.exports = {
+    createPaymentOrder,
+    verifyPayment,
+}

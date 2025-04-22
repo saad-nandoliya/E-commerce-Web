@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useCart } from "../../context/cart";
+import { useCart } from "../context/cart";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const API = process.env.REACT_APP_API_URL;
-
 
 const CheckoutPage = () => {
     const { cart, totalAmount, setCart } = useCart();
@@ -43,68 +44,98 @@ const CheckoutPage = () => {
     };
 
     const handlePayment = async () => {
-        const isLoaded = await loadRazorpay();
-        if (!isLoaded) {
-            alert("Razorpay SDK failed to load");
+        if (totalAmount <= 0) {
+            toast.error("Cart is empty or invalid amount");
             return;
         }
 
-        const { data } = await axios.post(`${API}/createPaymentOrder`, {
-            amount: totalAmount,
-        });
+        const isLoaded = await loadRazorpay();
+        if (!isLoaded) {
+            toast.error("Razorpay SDK failed to load");
+            return;
+        }
 
-        const options = {
-            key: "rzp_test_0PsAonKB4n1Cpe",
-            amount: data.amount,
-            currency: "INR",
-            name: "E-com",
-            description: "Order Payment",
-            order_id: data.orderId,
-            handler: async (response) => {
-                const paymentData = {
-                    order_id: response.razorpay_order_id,
-                    user_id: userInfo.id,
-                    payment_method: formData.paymentMethod,
-                    payment_id: response.razorpay_payment_id,
-                    signature: response.razorpay_signature,
-                    amount: totalAmount,
-                    cartItems: cart,
-                    shipping: formData,
-                };
+        try {
+            console.log("Initiating payment with amount:", totalAmount);
+            const { data } = await axios.post(`${API}/createPaymentOrder`, {
+                amount: totalAmount,
+            });
+            console.log("Razorpay order response:", data);
 
-                await axios.post(`${API}/verifyPayment`, paymentData);
-                console.log("💳 Sending payment data:", paymentData);
-                setCart([]);
-                localStorage.removeItem("cart");
-                alert("Order Placed Successfully!");
-            },
-            prefill: {
-                contact: formData.phone_number,
-            },
-            theme: { color: "#F97316" },
-        };
+            const options = {
+                key: "rzp_test_0PsAonKB4n1Cpe",
+                amount: data.amount,
+                currency: "INR",
+                name: "E-com",
+                description: "Order Payment",
+                order_id: data.orderId,
+                handler: async (response) => {
+                    try {
+                        const paymentData = {
+                            order_id: response.razorpay_order_id,
+                            user_id: userInfo.id,
+                            payment_method: formData.paymentMethod,
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature,
+                            amount: totalAmount,
+                            cartItems: cart,
+                            shipping: formData,
+                        };
 
-        const paymentObject = new window.Razorpay(options);
-        paymentObject.open();
+                        console.log("Sending payment data:", paymentData);
+                        await axios.post(`${API}/verifyPayment`, paymentData);
+                        setCart([]);
+                        localStorage.removeItem("cart");
+                        toast.success("Order Placed Successfully!");
+                    } catch (error) {
+                        console.error("Payment verification error:", error);
+                        toast.error("Failed to verify payment");
+                    }
+                },
+                prefill: {
+                    contact: formData.phone_number,
+                },
+                theme: { color: "#F97316" },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Payment initiation error:", error);
+            toast.error("Failed to initiate payment");
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.paymentMethod === "cod") {
-            const orderData = {
-                user_id: userInfo.id,
-                total_amount: totalAmount,
-                cartItems: cart,
-                shipping: formData,
-                payment_method: "cod",
-            };
 
-            await axios.post(`${API}/verifyPayment`, orderData);
-            setCart([]);
-            localStorage.removeItem("cart");
-            alert("Order Placed Successfully with COD!");
-        } else {
-            handlePayment();
+        // Validate form
+        if (!formData.address || !formData.city || !formData.state || !formData.zip_code || !formData.phone_number) {
+            toast.error("Please fill all shipping details");
+            return;
+        }
+
+        try {
+            if (formData.paymentMethod === "cod") {
+                const orderData = {
+                    user_id: userInfo.id,
+                    total_amount: totalAmount,
+                    cartItems: cart,
+                    shipping: formData,
+                    payment_method: "cod",
+                };
+
+                console.log("Sending COD order data:", orderData);
+                await axios.post(`${API}/verifyPayment`, orderData);
+                setCart([]);
+                localStorage.removeItem("cart");
+                toast.success("Order Placed Successfully with COD!");
+            } else {
+                await handlePayment();
+            }
+        } catch (error) {
+            console.error("Order submission error:", error);
+            toast.error("Failed to place order");
         }
     };
 
@@ -113,12 +144,10 @@ const CheckoutPage = () => {
             <div className="max-w-6xl w-full bg-white rounded-xl shadow-xl overflow-hidden">
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-3">
-                        {/* Left Section (Form) */}
                         <div className="md:col-span-2 p-4 sm:p-6 md:p-8 border-r border-gray-200 bg-gray-50">
                             <h2 className="text-2xl sm:text-3xl font-semibold text-center text-gray-800">🛒 Checkout</h2>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-6">
-                                {/* Shipping Address */}
                                 <div className="sm:col-span-2">
                                     <h3 className="text-lg font-medium text-gray-700">Shipping Address</h3>
                                 </div>
@@ -201,7 +230,6 @@ const CheckoutPage = () => {
                                     />
                                 </div>
 
-                                {/* Payment Method */}
                                 <div className="sm:col-span-2 mt-4">
                                     <h3 className="text-lg font-medium text-gray-700">Payment Method</h3>
                                     <select
@@ -218,7 +246,6 @@ const CheckoutPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Section (Price Details) */}
                         {cart.length > 0 && (
                             <div className="p-4 sm:p-6 bg-white">
                                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg sticky top-10 border border-gray-200">
@@ -250,6 +277,7 @@ const CheckoutPage = () => {
                         )}
                     </div>
                 </form>
+                <ToastContainer />
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ const CartItem = require("./routes/pagesRoute/cartItemRoutePage")
 const orderRoutes = require("./routes/paymentRoute/orderRoute");
 const paymentRoutes = require("./routes/paymentRoute/paymentRoute");
 const shippingRoutes = require("./routes/paymentRoute/shippingRoute");
+const webhookRoutes = require("./routes/paymentRoute/webhookRoutes");
 
 const app = express()
 const PORT = process.env.PORT
@@ -38,6 +39,7 @@ app.use("/", CartItem)
 app.use("/", orderRoutes)
 app.use("/", paymentRoutes)
 app.use("/", shippingRoutes)
+app.use("/", webhookRoutes)
 
 
 
