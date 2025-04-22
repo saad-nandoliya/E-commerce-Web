@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "../../context/cart";
 import axios from "axios";
 
-const BackendUrl = "https://e-com-web-n1aw.onrender.com";
+const API = process.env.REACT_APP_API_URL;
 
 const CheckoutPage = () => {
   const { cart, totalAmount } = useCart();
@@ -37,7 +37,7 @@ const CheckoutPage = () => {
       // 1. Create Razorpay Order & Save Order Data to DB
       const {
         data: { razorpayOrder, order_id },
-      } = await axios.post(`${BackendUrl}/checkout`, {
+      } = await axios.post(`${API}/checkout`, {
         user_id: userInfo,
         amount,
         items: cart.map((item) => ({
@@ -70,7 +70,7 @@ const CheckoutPage = () => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
 
-          await axios.post(`${BackendUrl}/payment-verification`, {
+          await axios.post(`${API}/payment-verification`, {
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature,
