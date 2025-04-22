@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCart } from "../context/cart";
+import { useCart } from "../../context/cart";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
