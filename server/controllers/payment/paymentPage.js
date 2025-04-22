@@ -35,7 +35,7 @@ createPaymentOrder = async (req, res) => {
 
 // Verify payment and save order
 verifyPayment = async (req, res) => {
-    const { order_id, user_id, payment_method, payment_id, signature, amount, cartItems, shipping } = req.body;
+    const { order_id, user_id, payment_method, payment_id, signature, amount, cartItems, shipping_addresses } = req.body;
     console.log("Received payment verification data:", req.body);
 
     try {
@@ -71,17 +71,18 @@ verifyPayment = async (req, res) => {
             );
         }
 
-        // Insert shipping
+        // Insert shipping_addresses
         await db.query(
-            "INSERT INTO shipping (user_id, address, city, state, country, zip_code, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            "INSERT INTO shipping_addresses (user_id, order_id, address, city, state, country, zip_code, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
             [
                 user_id,
-                shipping.address,
-                shipping.city,
-                shipping.state,
-                shipping.country,
-                shipping.zip_code,
-                shipping.phone_number,
+                orderId,
+                shipping_addresses.address,
+                shipping_addresses.city,
+                shipping_addresses.state,
+                shipping_addresses.country,
+                shipping_addresses.zip_code,
+                shipping_addresses.phone_number,
             ]
         );
 

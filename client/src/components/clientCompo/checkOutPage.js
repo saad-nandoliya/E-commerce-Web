@@ -73,7 +73,7 @@ const CheckoutPage = () => {
                     try {
                         const paymentData = {
                             order_id: response.razorpay_order_id,
-                            user_id: userInfo.id,
+                            user_id: userInfo,
                             payment_method: formData.paymentMethod,
                             payment_id: response.razorpay_payment_id,
                             signature: response.razorpay_signature,
