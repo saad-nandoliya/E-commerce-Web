@@ -42,102 +42,105 @@ const CheckoutPage = () => {
             document.body.appendChild(script);
         });
     };
-
     const handlePayment = async () => {
         if (totalAmount <= 0) {
-            toast.error("Cart is empty or invalid amount");
-            return;
+          toast.error("Cart is empty or invalid amount");
+          return;
         }
-
+      
         const isLoaded = await loadRazorpay();
         if (!isLoaded) {
-            toast.error("Razorpay SDK failed to load");
-            return;
+          toast.error("Razorpay SDK failed to load");
+          return;
         }
-
+      
         try {
-            console.log("Initiating payment with amount:", totalAmount);
-            const { data } = await axios.post(`${API}/createPaymentOrder`, {
-                amount: totalAmount,
-            });
-            console.log("Razorpay order response:", data);
-
-            const options = {
-                key: "rzp_test_0PsAonKB4n1Cpe",
-                amount: data.amount,
-                currency: "INR",
-                name: "E-com",
-                description: "Order Payment",
-                order_id: data.orderId,
-                handler: async (response) => {
-                    try {
-                        const paymentData = {
-                            order_id: response.razorpay_order_id,
-                            user_id: userInfo,
-                            payment_method: formData.paymentMethod,
-                            payment_id: response.razorpay_payment_id,
-                            signature: response.razorpay_signature,
-                            amount: totalAmount,
-                            cartItems: cart,
-                            shipping: formData,
-                        };
-
-                        console.log("Sending payment data:", paymentData);
-                        await axios.post(`${API}/verifyPayment`, paymentData);
-                        setCart([]);
-                        localStorage.removeItem("cart");
-                        toast.success("Order Placed Successfully!");
-                    } catch (error) {
-                        console.error("Payment verification error:", error);
-                        toast.error("Failed to verify payment");
-                    }
-                },
-                prefill: {
-                    contact: formData.phone_number,
-                },
-                theme: { color: "#F97316" },
-            };
-
-            const paymentObject = new window.Razorpay(options);
-            paymentObject.open();
-        } catch (error) {
-            console.error("Payment initiation error:", error);
-            toast.error("Failed to initiate payment");
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Validate form
-        if (!formData.address || !formData.city || !formData.state || !formData.zip_code || !formData.phone_number) {
-            toast.error("Please fill all shipping details");
-            return;
-        }
-
-        try {
-            if (formData.paymentMethod === "cod") {
-                const orderData = {
-                    user_id: userInfo.id,
-                    total_amount: totalAmount,
-                    cartItems: cart,
-                    shipping: formData,
-                    payment_method: "cod",
+          const { data } = await axios.post(`${API}/createPaymentOrder`, {
+            amount: totalAmount,
+          });
+      
+          const options = {
+            key: process.env.REACT_APP_RAZORPAY_KEY, // or use directly like "rzp_test_..."
+            amount: data.amount,
+            currency: "INR",
+            name: "E-com",
+            description: "Order Payment",
+            order_id: data.orderId,
+            handler: async (response) => {
+              try {
+                const paymentData = {
+                  order_id: response.razorpay_order_id,
+                  user_id: userInfo,
+                  payment_method: formData.paymentMethod,
+                  payment_id: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                  amount: totalAmount,
+                  cartItems: cart.map((item) => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    price: item.price,
+                  })),
+                  shipping: formData,
                 };
-
-                console.log("Sending COD order data:", orderData);
-                await axios.post(`${API}/verifyPayment`, orderData);
+      
+                await axios.post(`${API}/verifyPayment`, paymentData);
                 setCart([]);
                 localStorage.removeItem("cart");
-                toast.success("Order Placed Successfully with COD!");
-            } else {
-                await handlePayment();
-            }
+                toast.success("Order Placed Successfully!");
+              } catch (error) {
+                console.error("Payment verification error:", error);
+                toast.error("Failed to verify payment");
+              }
+            },
+            prefill: {
+              contact: formData.phone_number,
+            },
+            theme: { color: "#F97316" },
+          };
+      
+          const paymentObject = new window.Razorpay(options);
+          paymentObject.open();
         } catch (error) {
-            console.error("Order submission error:", error);
-            toast.error("Failed to place order");
+          console.error("Payment initiation error:", error);
+          toast.error("Failed to initiate payment");
         }
-    };
+      };
+      
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+      
+        if (!formData.address || !formData.city || !formData.state || !formData.zip_code || !formData.phone_number) {
+          toast.error("Please fill all shipping details");
+          return;
+        }
+      
+        try {
+          if (formData.paymentMethod === "cod") {
+            const codData = {
+              user_id: userInfo,
+              payment_method: "cod",
+              amount: totalAmount,
+              cartItems: cart.map((item) => ({
+                product_id: item.product_id,
+                quantity: item.quantity,
+                price: item.price,
+              })),
+              shipping: formData,
+            };
+      
+            await axios.post(`${API}/verifyPayment`, codData);
+            setCart([]);
+            localStorage.removeItem("cart");
+            toast.success("Order placed with Cash on Delivery");
+          } else {
+            await handlePayment();
+          }
+        } catch (error) {
+          console.error("Order submission error:", error);
+          toast.error("Failed to place order");
+        }
+      };
+      
 
     return (
         <div className="bg-gray-100 min-h-screen p-4 sm:p-6 flex justify-center">
