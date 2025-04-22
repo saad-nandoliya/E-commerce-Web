@@ -109,21 +109,22 @@ const CategoryList = () => {
               ))
             ) : (
               <div className="w-full text-center py-10">
-              <p className="text-2xl font-semibold text-gray-700 mb-2">Oops! Nothing found</p>
-              <p className="text-gray-500 mb-4">We couldn’t find any products matching your search.</p>
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedRange("all");
-                  setFiltered(products);
-                }}
-                className="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-200"
-              >
-                Reset Filters
-              </button>
-            </div>
-            
+                <p className="text-2xl font-semibold text-gray-700 mb-2">Oops! Nothing found</p>
+                <p className="text-gray-500 mb-4">We couldn’t find any products matching your search.</p>
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedRange("all");
+                    setFiltered(products);
+                  }}
+                  className="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-200"
+                >
+                  Reset Filters
+                </button>
+              </div>
+
             )}
+
           </div>
         </div>
       </div>
