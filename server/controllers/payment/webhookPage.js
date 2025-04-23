@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const axios = require("axios");
 const db = require("../../connection/connection");
+require("dotenv").config();
 
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -16,30 +17,29 @@ const razorpayWebhook = async (req, res) => {
     console.log("✅ Webhook verified successfully");
 
     const event = req.body.event;
+    const payload = req.body.payload.payment.entity;
 
-    if (event === "payment.captured" && req.body.payload.payment) {
-      const payload = req.body.payload.payment.entity;
-      const {
-        order_id,
-        id: payment_id,
-        amount,
-      } = payload;
+    // Extract payment_id and check the payment status directly via transaction_id
+    const { id: payment_id, amount } = payload;
 
+    if (event === "payment.captured" || event === "payment.failed") {
       try {
-        const razorpayRes = await axios.get(
-          `https://api.razorpay.com/v1/orders/${order_id}/payments`,
+        // 🔍 Razorpay API Call to get payment status using payment_id (transaction_id)
+        const paymentRes = await axios.get(
+          `https://api.razorpay.com/v1/payments/${payment_id}`,
           {
             auth: {
               username: process.env.RAZORPAY_KEY_ID,
-              password: process.env.RAZORPAY_KEY_SECRET, // Fixed: you wrote `RAZORPAY_SECRET`
+              password: process.env.RAZORPAY_KEY_SECRET,
             },
           }
         );
 
-        const payment = razorpayRes.data.items[0];
-        const method = payment.method;
-        const status = payment.status;
+        const payment = paymentRes.data;
+        const method = payment.method; // upi, card, etc.
+        const status = payment.status; // captured, failed, etc.
 
+        // ✅ Check if this transaction_id already exists
         const check = await db.query(
           "SELECT * FROM payments WHERE transaction_id = $1",
           [payment_id]
@@ -59,13 +59,13 @@ const razorpayWebhook = async (req, res) => {
           `;
 
           const values = [
-            order_id || null,
-            null,
+            null, // No need for order_id if we're using payment_id
+            null, // You can insert user_id here dynamically if you need
             method,
             status,
             payment_id,
-            amount / 100,
-            "Completed",
+            amount / 100, // Convert amount from paise to INR
+            status === "captured" ? "Completed" : "Failed", // Handle captured or failed status
           ];
 
           await db.query(insertQuery, values);
@@ -78,9 +78,6 @@ const razorpayWebhook = async (req, res) => {
       } catch (err) {
         console.error("Webhook Razorpay/API Error:", err.message);
       }
-    } else {
-      console.log(`⚠️ Event received: ${event}`);
-      console.log("❗ Payment entity not available or not a captured event");
     }
 
     res.status(200).json({ status: "ok" });
@@ -89,6 +86,5 @@ const razorpayWebhook = async (req, res) => {
     res.status(400).json({ error: "Invalid signature" });
   }
 };
-
 
 module.exports = { razorpayWebhook };

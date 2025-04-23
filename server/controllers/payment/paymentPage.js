@@ -76,7 +76,7 @@ const paymentVerification = async (req, res) => {
     if (isAuthentic) {
       // 🧠 Get latest payment details from Razorpay
       const paymentRes = await axios.get(
-        `https://api.razorpay.com/v1/orders/${razorpay_order_id}/payments`,
+        `https://api.razorpay.com/v1/payments/${razorpay_payment_id}`,
         {
           auth: {
             username: process.env.RAZORPAY_KEY_ID,
@@ -85,7 +85,7 @@ const paymentVerification = async (req, res) => {
         }
       );
 
-      const paymentData = paymentRes.data.items[0];
+      const paymentData = paymentRes.data;
       const method = paymentData.method;
       const status = paymentData.status;
 
@@ -109,6 +109,8 @@ const paymentVerification = async (req, res) => {
           VALUES ($1, $2, $3, $4, $5, $6, $7)
         `;
 
+        const orderStatus = status === "captured" ? "Paid" : "Failed"; // Handle captured and failed payments
+
         const values = [
           order_id || null,
           user_id || null,
@@ -116,7 +118,7 @@ const paymentVerification = async (req, res) => {
           status,
           razorpay_payment_id,
           amount || null,
-          "Completed",
+          orderStatus, // Set the payment status based on the actual payment status
         ];
 
         await db.query(paymentQuery, values);
@@ -124,7 +126,7 @@ const paymentVerification = async (req, res) => {
         // 🆙 Optional: Update orders table
         await db.query(
           "UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2",
-          ["Paid", order_id]
+          [orderStatus, order_id]
         );
 
         console.log("💾 Payment recorded in DB");
@@ -143,6 +145,7 @@ const paymentVerification = async (req, res) => {
     res.status(500).json({ success: false, message: "Payment verification failed" });
   }
 };
+
 
 module.exports = {
   checkout,
