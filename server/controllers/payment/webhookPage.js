@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const axios = require("axios");
 const db = require("../../connection/connection");
 
 const razorpayWebhook = async (req, res) => {
@@ -22,11 +23,25 @@ const razorpayWebhook = async (req, res) => {
         order_id,
         id: payment_id,
         amount,
-        status,
-        method,
       } = payload;
 
       try {
+        // 🔍 Razorpay API Call to confirm status + method
+        const razorpayRes = await axios.get(
+          `https://api.razorpay.com/v1/orders/${order_id}/payments`,
+          {
+            auth: {
+              username: process.env.RAZORPAY_KEY_ID,
+              password: process.env.RAZORPAY_SECRET,
+            },
+          }
+        );
+
+        const payment = razorpayRes.data.items[0];
+        const method = payment.method; // upi, card, etc.
+        const status = payment.status; // captured, failed etc.
+
+
         const check = await db.query(
           "SELECT * FROM payments WHERE transaction_id = $1",
           [payment_id]
@@ -57,11 +72,13 @@ const razorpayWebhook = async (req, res) => {
 
           await db.query(insertQuery, values);
           console.log("💾 Webhook: Payment saved to DB");
+          console.log("🧾 Status:", status);
+          console.log("💳 Method:", method);
         } else {
           console.log("⚠️ Webhook: Payment already exists");
         }
       } catch (err) {
-        console.error("Webhook DB Insert Error:", err.message);
+        console.error("Webhook Razorpay/API Error:", err.message);
       }
     }
 
