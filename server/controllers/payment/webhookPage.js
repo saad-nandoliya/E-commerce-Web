@@ -59,8 +59,8 @@ const razorpayWebhook = async (req, res) => {
           `;
 
           const values = [
-            null, // No need for order_id if we're using payment_id
-            null, // You can insert user_id here dynamically if you need
+            order_id,
+            user_id,
             method,
             status,
             payment_id,
