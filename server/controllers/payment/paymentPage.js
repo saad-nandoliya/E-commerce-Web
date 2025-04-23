@@ -12,7 +12,7 @@ const razorpay = new Razorpay({
 const checkout = async (req, res) => {
   try {
     const { user_id, amount, items } = req.body;
-console.log(req.body)
+    console.log(req.body)
 
 
     // 1. Insert into orders table
