@@ -63,8 +63,8 @@ const razorpayWebhook = async (req, res) => {
           const values = [
             order_id || null,
             null,
-            method || "razorpay",
-            status || "captured",
+            method,
+            status,
             payment_id,
             amount / 100,
             "Completed",

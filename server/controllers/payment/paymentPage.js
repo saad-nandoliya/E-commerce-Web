@@ -86,8 +86,8 @@ const paymentVerification = async (req, res) => {
       );
 
       const paymentData = paymentRes.data.items[0];
-      const method = paymentData.method || "razorpay";
-      const status = paymentData.status || "captured";
+      const method = paymentData.method;
+      const status = paymentData.status;
 
       // ✅ Check for duplicate transaction
       const existing = await db.query(
