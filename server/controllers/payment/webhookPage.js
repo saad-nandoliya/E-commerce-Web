@@ -16,9 +16,9 @@ const razorpayWebhook = async (req, res) => {
     console.log("✅ Webhook verified successfully");
 
     const event = req.body.event;
-    const payload = req.body.payload.payment.entity;
 
-    if (event === "payment.captured") {
+    if (event === "payment.captured" && req.body.payload.payment) {
+      const payload = req.body.payload.payment.entity;
       const {
         order_id,
         id: payment_id,
@@ -26,21 +26,19 @@ const razorpayWebhook = async (req, res) => {
       } = payload;
 
       try {
-        // 🔍 Razorpay API Call to confirm status + method
         const razorpayRes = await axios.get(
           `https://api.razorpay.com/v1/orders/${order_id}/payments`,
           {
             auth: {
               username: process.env.RAZORPAY_KEY_ID,
-              password: process.env.RAZORPAY_SECRET,
+              password: process.env.RAZORPAY_KEY_SECRET, // Fixed: you wrote `RAZORPAY_SECRET`
             },
           }
         );
 
         const payment = razorpayRes.data.items[0];
-        const method = payment.method; // upi, card, etc.
-        const status = payment.status; // captured, failed etc.
-
+        const method = payment.method;
+        const status = payment.status;
 
         const check = await db.query(
           "SELECT * FROM payments WHERE transaction_id = $1",
@@ -80,6 +78,9 @@ const razorpayWebhook = async (req, res) => {
       } catch (err) {
         console.error("Webhook Razorpay/API Error:", err.message);
       }
+    } else {
+      console.log(`⚠️ Event received: ${event}`);
+      console.log("❗ Payment entity not available or not a captured event");
     }
 
     res.status(200).json({ status: "ok" });
@@ -88,5 +89,6 @@ const razorpayWebhook = async (req, res) => {
     res.status(400).json({ error: "Invalid signature" });
   }
 };
+
 
 module.exports = { razorpayWebhook };
