@@ -15,6 +15,8 @@ const CheckoutPage = () => {
     zip: "",
     paymentMethod: "razorpay",
   });
+  const [loading, setLoading] = useState(false);  // Loading state
+  const [error, setError] = useState(null); // Error state
 
   const userInfo = JSON.parse(localStorage.getItem("user_Id"));
 
@@ -34,6 +36,8 @@ const CheckoutPage = () => {
 
   const checkoutHandler = async (amount) => {
     try {
+      setLoading(true); // Set loading to true
+
       // 1. Create Razorpay Order & Save Order Data to DB
       const {
         data: { razorpayOrder, order_id },
@@ -89,16 +93,25 @@ const CheckoutPage = () => {
 
       rzp.on("payment.failed", function (response) {
         console.error("Payment Failed:", response.error);
-        alert("Payment Failed. Please try again.");
+        setError("Payment failed. Please try again.");
+        setLoading(false);  // Reset loading state
       });
     } catch (error) {
       console.error("Checkout Error:", error.message);
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
+      setLoading(false);  // Reset loading state
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!formData.name || !formData.phone || !formData.address || !formData.zip || !formData.city || !formData.state) {
+      setError("Please fill all fields before submitting.");
+      return;
+    }
+
     if (formData.paymentMethod === "razorpay") {
       checkoutHandler(totalAmount);
     } else {
@@ -116,6 +129,13 @@ const CheckoutPage = () => {
               <h2 className="text-2xl sm:text-3xl font-semibold text-center text-gray-800">
                 🛒 Checkout
               </h2>
+
+              {/* Error message */}
+              {error && (
+                <div className="text-red-500 text-center mb-4">
+                  {error}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                 {/* Personal Info */}
@@ -276,6 +296,7 @@ const CheckoutPage = () => {
                   <button
                     type="submit"
                     className="w-full mt-4 sm:mt-5 py-2 sm:py-3 bg-orange-500 text-white rounded-lg font-semibold text-lg hover:bg-orange-600 transition "
+                    disabled={loading}
                   >
                     ✅ Continue to Pay
                   </button>

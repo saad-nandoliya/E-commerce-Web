@@ -1,120 +1,86 @@
 const crypto = require("crypto");
-const axios = require("axios");
-const db = require("../../connection/connection");
-require("dotenv").config();
-
-// Retry logic for API calls
-const retry = async (fn, retries = 3, delay = 1000) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await fn();
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
-};
+const pool = require("../db"); // PostgreSQL DB connection pool
 
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
   const signature = req.headers["x-razorpay-signature"];
-  const body = Buffer.from(JSON.stringify(req.body));
+  const body = JSON.stringify(req.body);
 
   const expectedSignature = crypto
     .createHmac("sha256", secret)
     .update(body)
     .digest("hex");
 
-  if (signature === expectedSignature) {
-    console.log("✅ Webhook verified successfully");
+  if (signature !== expectedSignature) {
+    console.log("Invalid signature ❌");
+    return res.status(400).json({ success: false, message: "Invalid signature" });
+  }
 
-    const event = req.body.event;
+  const event = req.body.event;
+
+  if (event === "payment.captured") {
     const payload = req.body.payload.payment.entity;
 
-    // Handle payment.captured and payment.failed events
-    if (event === "payment.captured" || event === "payment.failed") {
-      const { order_id, id: payment_id, amount } = payload;
+    const {
+      order_id,
+      id: payment_id,
+      amount,
+      method,
+      status,
+      notes,
+    } = payload;
 
-      try {
-        // Fetch user_id from orders table
-        const orderCheck = await db.query(
-          "SELECT user_id FROM orders WHERE order_id = $1",
-          [order_id]
-        );
-        const user_id = orderCheck.rows[0]?.user_id || null;
-        if (!user_id) {
-          console.error("user_id not found for order_id:", order_id);
-          return res.status(200).json({ status: "ok" });
-        }
+    const razorpayOrderId = order_id;
+    const user_id = notes?.user_id || null;
 
-        // Razorpay API Call to confirm status
-        const razorpayRes = await retry(() =>
-          axios.get(`https://api.razorpay.com/v1/orders/${order_id}/payments`, {
-            auth: {
-              username: process.env.RAZORPAY_KEY_ID,
-              password: process.env.RAZORPAY_SECRET,
-            },
-          })
-        );
+    try {
+      // Check if already exists
+      const check = await pool.query(
+        "SELECT * FROM payments WHERE transaction_id = $1",
+        [payment_id]
+      );
 
-        const payment = razorpayRes.data.items && razorpayRes.data.items[0];
-        if (!payment) {
-          console.error("No payment found for order_id:", order_id);
-          return res.status(200).json({ status: "ok" });
-        }
-        const payment_status = payment.status; // captured, failed, etc.
-
-        // Set custom status based on payment_status
-        const status = payment_status === "captured" ? "Completed" : "Failed";
-
-        // Check if payment exists
-        const check = await db.query(
-          "SELECT * FROM payments WHERE transaction_id = $1",
-          [payment_id]
-        );
-
-        if (check.rows.length === 0) {
-          // Insert new payment record
-          const insertQuery = `
-            INSERT INTO payments (
-              order_id, user_id, payment_status, transaction_id, amount, status
-            ) VALUES ($1, $2, $3, $4, $5, $6)
-          `;
-          const values = [
+      if (check.rows.length === 0) {
+        const insertQuery = `
+          INSERT INTO payments (
             order_id,
             user_id,
+            payment_order_id,
+            payment_method,
             payment_status,
-            payment_id,
-            amount / 100,
-            status,
-          ];
-          await db.query(insertQuery, values);
-          console.log("💾 Payment saved to DB");
-          console.log("🧾 Status:", status);
-        } else {
-          // Update existing payment record
-          const updateQuery = `
-            UPDATE payments
-            SET payment_status = $1, status = $2, amount = $3
-            WHERE transaction_id = $4
-          `;
-          const updateValues = [payment_status, status, amount / 100, payment_id];
-          await db.query(updateQuery, updateValues);
-          console.log("🔄 Payment updated in DB");
-          console.log("🧾 Status:", status);
-        }
-      } catch (err) {
-        console.error("Webhook Error:", err.message);
-      }
-    } else {
-      console.log("ℹ️ Unhandled event:", event);
-    }
+            transaction_id,
+            amount,
+            status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `;
 
-    return res.status(200).json({ status: "ok" });
+        const values = [
+          order_id,
+          user_id,
+          razorpayOrderId,
+          method,
+          status,
+          payment_id,
+          amount / 100,
+          "Completed",
+        ];
+
+        await pool.query(insertQuery, values);
+
+        console.log("✅ Payment inserted successfully:", order_id);
+        return res.status(200).json({ success: true, message: "Payment recorded" });
+      } else {
+        console.log("⚠️ Payment already exists:", payment_id);
+        return res.status(200).json({ success: true, message: "Payment already exists" });
+      }
+    } catch (err) {
+      console.error("❌ Error inserting payment:", err.message);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
   } else {
-    console.warn("❌ Webhook signature mismatch");
-    return res.status(400).json({ error: "Invalid signature" });
+    return res.status(200).json({ success: true, message: "Event ignored" });
   }
 };
 
-module.exports = { razorpayWebhook };
+module.exports = razorpayWebhook;

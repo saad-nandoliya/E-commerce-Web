@@ -97,26 +97,28 @@ const paymentVerification = async (req, res) => {
 
       if (existing.rows.length === 0) {
         const paymentQuery = `
-          INSERT INTO payments (
-            order_id,
-            user_id,
-            payment_method,
-            payment_status,
-            transaction_id,
-            amount,
-            status
-          )
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `;
+        INSERT INTO payments (
+          order_id,
+          user_id,
+          payment_order_id,
+          payment_method,
+          payment_status,
+          transaction_id,
+          amount,
+          status
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `;
 
         const values = [
           order_id || null,
           user_id || null,
+          razorpay_order_id,   // 👈 yeh value galti se method tha, fix kiya
           method,
-          status,
           razorpay_payment_id,
+          status,
           amount || null,
-          "Completed",
+          "Completed",         // ✅ Ab 8th value aa gayi
         ];
 
         await db.query(paymentQuery, values);
