@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const pool = require("../../connection/connection"); // PostgreSQL DB connection pool
+require("dotenv").config();
 
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
