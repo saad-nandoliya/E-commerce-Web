@@ -34,10 +34,10 @@ const CheckoutPage = () => {
 
   const checkoutHandler = async (amount) => {
     try {
-      if (!userInfo || !userInfo.id) {
-        alert("Please log in to proceed with payment.");
-        return;
-      }
+      // if (!userInfo ) {
+      //   alert("Please log in to proceed with payment.");
+      //   return;
+      // }
 
       // Create Razorpay Order & Save Order Data to DB
       const {
