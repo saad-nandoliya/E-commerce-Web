@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const pool = require("../db"); // PostgreSQL DB connection pool
+const pool = require("../../connection/connection"); // PostgreSQL DB connection pool
 
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
