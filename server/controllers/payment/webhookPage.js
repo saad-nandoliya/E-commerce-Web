@@ -77,7 +77,7 @@ const razorpayWebhook = async (req, res) => {
           axios.get(`https://api.razorpay.com/v1/orders/${payment_order_id}/payments`, {
             auth: {
               username: process.env.RAZORPAY_KEY_ID,
-              password: process.env.RAZORPAY_SECRET,
+              password: process.env.RAZORPAY_KEY_SECRET,
             },
           })
         );
@@ -111,7 +111,7 @@ const razorpayWebhook = async (req, res) => {
           const values = [
             order_id,
             user_id,
-            payment_order_id,
+            order_id,
             payment_method,
             payment_status,
             payment_id,
@@ -123,7 +123,7 @@ const razorpayWebhook = async (req, res) => {
           logToFile("🧾 Status: " + status);
           logToFile("💳 Method: " + payment_method);
           logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + payment_order_id);
+          logToFile("🆔 Payment Order ID: " + order_id);
         } else {
           // Update existing payment record
           const updateQuery = `
@@ -143,7 +143,7 @@ const razorpayWebhook = async (req, res) => {
           logToFile("🧾 Status: " + status);
           logToFile("💳 Method: " + payment_method);
           logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + payment_order_id);
+          logToFile("🆔 Payment Order ID: " + order_id);
         }
       } catch (err) {
         logToFile("Webhook Error: " + err.message + "\nStack: " + err.stack);
