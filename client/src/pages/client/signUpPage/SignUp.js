@@ -16,6 +16,7 @@ const SignUp = () => {
     email_or_phone: "",
     password: "",
     otp: "",
+    picture: "",
   });
 
   const handleInputChange = (e) => {
@@ -59,7 +60,7 @@ const SignUp = () => {
     <div className="flex items-center justify-center">
       <ToastContainer />
       <div className="bg-white rounded-lg p-2 shadow-md flex w-full max-w-5xl">
-        
+
         {/* Left Image Section */}
         <div className="w-1/2 hidden md:flex">
           <img

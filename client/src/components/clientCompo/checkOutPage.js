@@ -34,6 +34,7 @@ const CheckoutPage = () => {
 
   const checkoutHandler = async (amount) => {
     try {
+
       // if (!userInfo ) {
       //   alert("Please log in to proceed with payment.");
       //   return;
