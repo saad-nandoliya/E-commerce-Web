@@ -15,8 +15,6 @@ const CheckoutPage = () => {
     zip: "",
     paymentMethod: "razorpay",
   });
-  const [loading, setLoading] = useState(false);  // Loading state
-  const [error, setError] = useState(null); // Error state
 
   const userInfo = JSON.parse(localStorage.getItem("user_Id"));
 
@@ -36,11 +34,14 @@ const CheckoutPage = () => {
 
   const checkoutHandler = async (amount) => {
     try {
-      setLoading(true); // Set loading to true
+      if (!userInfo || !userInfo.id) {
+        alert("Please log in to proceed with payment.");
+        return;
+      }
 
-      // 1. Create Razorpay Order & Save Order Data to DB
+      // Create Razorpay Order & Save Order Data to DB
       const {
-        data: { razorpayOrder, order_id },
+        data: { razorpayOrder, order_id, payment_order_id },
       } = await axios.post(`${API}/checkout`, {
         user_id: userInfo,
         amount,
@@ -52,7 +53,7 @@ const CheckoutPage = () => {
       });
 
       const options = {
-        key: "rzp_test_0PsAonKB4n1Cpe", // Razorpay Key ID
+        key: "rzp_test_0PsAonKB4n1Cpe",
         amount: razorpayOrder.amount,
         currency: "INR",
         name: "E-com",
@@ -65,14 +66,15 @@ const CheckoutPage = () => {
         },
         notes: {
           address: formData.address,
+          user_id: userInfo.toString(),
+          order_id: order_id.toString(),
         },
         theme: {
           color: "#121212",
         },
         handler: async function (response) {
-          // 2. Verify Payment on Backend
-          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-            response;
+          // Verify Payment on Backend
+          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
 
           await axios.post(`${API}/payment-verification`, {
             razorpay_order_id,
@@ -93,25 +95,16 @@ const CheckoutPage = () => {
 
       rzp.on("payment.failed", function (response) {
         console.error("Payment Failed:", response.error);
-        setError("Payment failed. Please try again.");
-        setLoading(false);  // Reset loading state
+        alert("Payment Failed. Please try again.");
       });
     } catch (error) {
       console.error("Checkout Error:", error.message);
-      setError("Something went wrong. Please try again.");
-      setLoading(false);  // Reset loading state
+      alert("Something went wrong. Please try again.");
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Basic validation
-    if (!formData.name || !formData.phone || !formData.address || !formData.zip || !formData.city || !formData.state) {
-      setError("Please fill all fields before submitting.");
-      return;
-    }
-
     if (formData.paymentMethod === "razorpay") {
       checkoutHandler(totalAmount);
     } else {
@@ -129,13 +122,6 @@ const CheckoutPage = () => {
               <h2 className="text-2xl sm:text-3xl font-semibold text-center text-gray-800">
                 🛒 Checkout
               </h2>
-
-              {/* Error message */}
-              {error && (
-                <div className="text-red-500 text-center mb-4">
-                  {error}
-                </div>
-              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                 {/* Personal Info */}
@@ -296,7 +282,6 @@ const CheckoutPage = () => {
                   <button
                     type="submit"
                     className="w-full mt-4 sm:mt-5 py-2 sm:py-3 bg-orange-500 text-white rounded-lg font-semibold text-lg hover:bg-orange-600 transition "
-                    disabled={loading}
                   >
                     ✅ Continue to Pay
                   </button>
