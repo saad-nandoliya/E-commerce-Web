@@ -26,7 +26,7 @@ app.use(cors({
 }));
 app.use(express.json())
 app.use(bodyparser.json())
-app.use("/payment/webhook", express.raw({ type: "application/json" }));
+
 
 
 app.use("/", userLogin)

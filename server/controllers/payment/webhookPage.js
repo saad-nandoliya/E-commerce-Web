@@ -1,10 +1,8 @@
 const crypto = require("crypto");
-const pool = require("../../connection/connection"); // PostgreSQL DB connection pool
-require("dotenv").config();
+const db = require("../../connection/connection");
 
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-
   const signature = req.headers["x-razorpay-signature"];
   const body = JSON.stringify(req.body);
 
@@ -13,75 +11,65 @@ const razorpayWebhook = async (req, res) => {
     .update(body)
     .digest("hex");
 
-  if (signature !== expectedSignature) {
-    console.log("Invalid signature ❌");
-    return res.status(400).json({ success: false, message: "Invalid signature" });
-  }
+  if (signature === expectedSignature) {
+    console.log("✅ Webhook verified successfully");
 
-  const event = req.body.event;
-
-  if (event === "payment.captured") {
+    const event = req.body.event;
     const payload = req.body.payload.payment.entity;
 
-    const {
-      order_id,
-      id: payment_id,
-      amount,
-      method,
-      status,
-      notes,
-    } = payload;
+    if (event === "payment.captured") {
+      const {
+        order_id,
+        id: payment_id,
+        amount,
+        status,
+        method,
+      } = payload;
 
-    const razorpayOrderId = order_id;
-    const user_id = notes?.user_id || null;
+      try {
+        const check = await db.query(
+          "SELECT * FROM payments WHERE transaction_id = $1",
+          [payment_id]
+        );
 
-    try {
-      // Check if already exists
-      const check = await pool.query(
-        "SELECT * FROM payments WHERE transaction_id = $1",
-        [payment_id]
-      );
+        if (check.rows.length === 0) {
+          const insertQuery = `
+            INSERT INTO payments (
+              order_id,
+              user_id,
+              payment_method,
+              payment_status,
+              transaction_id,
+              amount,
+              status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `;
 
-      if (check.rows.length === 0) {
-        const insertQuery = `
-          INSERT INTO payments (
-            order_id,
-            user_id,
-            payment_order_id,
-            payment_method,
-            payment_status,
-            transaction_id,
-            amount,
-            status
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        `;
+          const values = [
+            order_id || null,
+            null,
+            method || "razorpay",
+            status || "captured",
+            payment_id,
+            amount / 100,
+            "Completed",
+          ];
 
-        const values = [
-          order_id,
-          user_id,
-          razorpayOrderId,
-          method,
-          status,
-          payment_id,
-          amount / 100,
-          "Completed",
-        ];
-
-        await pool.query(insertQuery, values);
-
-        console.log("✅ Payment inserted successfully:", order_id);
-        return res.status(200).json({ success: true, message: "Payment recorded" });
-      } else {
-        console.log("⚠️ Payment already exists:", payment_id);
-        return res.status(200).json({ success: true, message: "Payment already exists" });
+          await db.query(insertQuery, values);
+          console.log("💾 Webhook: Payment saved to DB");
+        } else {
+          console.log("⚠️ Webhook: Payment already exists");
+        }
+      } catch (err) {
+        console.error("Webhook DB Insert Error:", err.message);
       }
-    } catch (err) {
-      console.error("❌ Error inserting payment:", err.message);
-      return res.status(500).json({ success: false, message: "Database error" });
     }
+
+    res.status(200).json({ status: "ok" });
   } else {
-    return res.status(200).json({ success: true, message: "Event ignored" });
+    console.warn("❌ Webhook signature mismatch");
+    res.status(400).json({ error: "Invalid signature" });
   }
 };
 
-module.exports = razorpayWebhook;
+module.exports = { razorpayWebhook };
