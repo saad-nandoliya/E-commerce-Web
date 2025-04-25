@@ -23,9 +23,9 @@ const addCategory = (req, res) => {
   db.query(q, values, (err, result) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error adding category");
+      res.status(500).json({err : "Error adding category"});
     } else {
-      res.status(201).send("Category added successfully");
+      res.status(201).json({message : "Category added successfully"});
     }
   });
 };
