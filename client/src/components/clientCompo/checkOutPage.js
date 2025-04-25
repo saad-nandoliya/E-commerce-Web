@@ -54,7 +54,7 @@ const CheckoutPage = () => {
       });
 
       const options = {
-        key: process.env.RAZORPAY_KEY_ID,
+        key: "rzp_test_0PsAonKB4n1Cpe",
         amount: razorpayOrder.amount,
         currency: "INR",
         name: "E-com",
