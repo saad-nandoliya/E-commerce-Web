@@ -141,12 +141,7 @@ const path = require("path");
 const db = require("../../connection/connection");
 const cloudinary = require("cloudinary").v2;
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+
 
 const getCategories = (req, res) => {
   db.query("SELECT * FROM categories ORDER BY id ASC", (err, result) => {
@@ -158,49 +153,23 @@ const getCategories = (req, res) => {
   });
 };
 
-const addCategory = async (req, res) => {
-  const title = req.body.title;
-  let imageUrl = null;
-
-  // Input validation
-  if (!title) {
-    console.error("Missing title in request body");
-    return res.status(400).json({ error: "Title is required" });
-  }
-
-  // Handle image upload
-  if (req.file) {
-    try {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "categoryImage",
-        resource_type: "image",
-      });
-      imageUrl = result.secure_url;
-      console.log("Cloudinary upload successful:", imageUrl);
-    } catch (err) {
-      console.error("Cloudinary upload error:", err.message, err.stack);
-      return res.status(500).json({ error: "Error uploading image to Cloudinary" });
-    }
-  } else {
-    console.warn("No image provided in request");
-  }
-
-  const query = `
-    INSERT INTO categories (image, title, status, created_at, updated_at)
-    VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    RETURNING id
-  `;
-  const values = [imageUrl, title, "active"];
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      console.error("Database error adding category:", err.message, err.stack);
-      return res.status(500).json({ error: "Error adding category to database", details: err.message });
-    }
-    console.log(`Category added successfully, ID: ${result.rows[0].id}`);
-    res.status(201).json({ message: "Category added successfully", categoryId: result.rows[0].id });
-  });
-};
+const addCategory = (req, res) => {
+    const title = req.body.title;
+    const image = req.file ? req.file.path : null; // ✅ NOT .filename
+    console.log("categoryImage", req.file)
+  
+    const q = "INSERT INTO categories (image, title, status) VALUES ($1, $2, $3)";
+    const values = [image, title, "active"];
+  
+    db.query(q, values, (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({err : "Error adding category"});
+      } else {
+        res.status(201).json({message : "Category added successfully"});
+      }
+    });
+  };
 
 const updateCategory = async (req, res) => {
   const id = req.params.id;
