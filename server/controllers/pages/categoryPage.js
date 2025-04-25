@@ -15,18 +15,26 @@ const getCategories = (req, res) => {
 const addCategory = (req, res) => {
   const title = req.body.title;
   const image = req.file ? req.file.path : null; // ✅ NOT .filename
-  console.log("categoryImage", req.file)
+
+  console.log("categoryImage", req.file);
 
   const q = "INSERT INTO categories (image, title, status) VALUES ($1, $2, $3)";
   const values = [image, title, "active"];
 
   db.query(q, values, (err, result) => {
+    //   if (err) {
+    //     console.log(err);
+    //     res.status(500).json({err : "Error adding category"});
+    //   } else {
+    //     res.status(201).json({message : "Category added successfully"});
+    //   }
+    // });
     if (err) {
-      console.log(err);
-      res.status(500).json({err : "Error adding category"});
-    } else {
-      res.status(201).json({message : "Category added successfully"});
+      console.error("Error in DB query:", err);
+      return res.status(500).json({ error: "Error adding category" }); // ✅ use return here
     }
+
+    return res.status(201).json({ message: "Category added successfully" }); // ✅ also use return here
   });
 };
 
@@ -34,6 +42,7 @@ const updateCategory = async (req, res) => {
   const id = req.params.id;
   const { title } = req.body;
   const newImage = req.file ? req.file.path : null;  // Cloudinary URL
+
 
   const selectQuery = "SELECT image FROM categories WHERE id = $1";
   db.query(selectQuery, [id], async (err, data) => {
