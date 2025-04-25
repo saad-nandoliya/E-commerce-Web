@@ -91,7 +91,6 @@ const razorpayWebhook = async (req, res) => {
 
         const payment_method = payment.method; // upi, card, etc.
         const payment_status = payment.status; // captured, failed
-        const payment_order_id = payment.order_id; 
         const status = payment_status === "captured" ? "Completed" : "Failed";
 
         // Check if payment exists
@@ -112,7 +111,7 @@ const razorpayWebhook = async (req, res) => {
           const values = [
             order_id,
             user_id,
-            payment_order_id,
+            order_id,
             payment_method,
             payment_status,
             payment_id,
@@ -124,7 +123,7 @@ const razorpayWebhook = async (req, res) => {
           logToFile("🧾 Status: " + status);
           logToFile("💳 Method: " + payment_method);
           logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + payment_order_id);
+          logToFile("🆔 Payment Order ID: " + order_id);
         } else {
           // Update existing payment record
           const updateQuery = `
@@ -144,7 +143,7 @@ const razorpayWebhook = async (req, res) => {
           logToFile("🧾 Status: " + status);
           logToFile("💳 Method: " + payment_method);
           logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + payment_order_id);
+          logToFile("🆔 Payment Order ID: " + order_id);
         }
       } catch (err) {
         logToFile("Webhook Error: " + err.message + "\nStack: " + err.stack);
