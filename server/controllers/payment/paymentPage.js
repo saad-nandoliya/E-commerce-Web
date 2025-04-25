@@ -97,6 +97,7 @@ const paymentVerification = async (req, res) => {
       const paymentData = paymentRes.data.items[0];
       const payment_method = paymentData.method;
       const payment_status = paymentData.status;
+      const payment_order_id = payment.order_id; 
       const status = payment_status === "captured" ? "Completed" : "Failed";
 
       // Check for duplicate transaction
@@ -115,7 +116,7 @@ const paymentVerification = async (req, res) => {
         const values = [
           order_id,
           user_id,
-          order_id,
+          payment_order_id,
           payment_method,
           payment_status,
           razorpay_payment_id,
@@ -128,7 +129,7 @@ const paymentVerification = async (req, res) => {
         console.log("🧾 Status:", status);
         console.log("💳 Method:", payment_method);
         console.log("🆔 Payment ID:", razorpay_payment_id);
-        console.log("🆔 Payment Order ID:", order_id);
+        console.log("🆔 Payment Order ID:", payment_order_id);
       } else {
         console.log("⚠️ Payment already exists in DB");
       }
