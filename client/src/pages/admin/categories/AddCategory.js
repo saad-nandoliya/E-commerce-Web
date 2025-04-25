@@ -13,6 +13,7 @@ const AddCategory = () => {
     const [category, setCategory] = useState({
         image: "",
         title: "",
+        status: "",
     });
 
 
@@ -34,6 +35,7 @@ const AddCategory = () => {
         const formData = new FormData();
         formData.append("image", category.image);
         formData.append("title", category.title);
+        formData.append("status", category.status);
 
         try {
             axios.post(`${API}/addcategory`, formData, {

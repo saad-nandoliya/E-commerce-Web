@@ -17,8 +17,8 @@ const addCategory = (req, res) => {
   const image = req.file ? req.file.path : null; // ✅ NOT .filename
   console.log("categoryImage", req.file)
 
-  const q = "INSERT INTO categories (image, title) VALUES ($1, $2)";
-  const values = [image, title];
+  const q = "INSERT INTO categories (image, title, status) VALUES ($1, $2, $3)";
+  const values = [image, title, "active"];
 
   db.query(q, values, (err, result) => {
     if (err) {

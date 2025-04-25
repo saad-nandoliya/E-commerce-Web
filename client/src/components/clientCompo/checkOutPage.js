@@ -35,11 +35,6 @@ const CheckoutPage = () => {
   const checkoutHandler = async (amount) => {
     try {
 
-      // if (!userInfo ) {
-      //   alert("Please log in to proceed with payment.");
-      //   return;
-      // }
-
       // Create Razorpay Order & Save Order Data to DB
       const {
         data: { razorpayOrder, order_id, payment_order_id },
