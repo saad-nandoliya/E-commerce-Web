@@ -9,9 +9,7 @@ const API = process.env.REACT_APP_API_URL;
 
 const ProductsDetail = () => {
     const [product, setProduct] = useState(null);
-    console.log(product)
     const { id } = useParams();
-    console.log("Product ID from URL:", id)
     const { addToCart, cart } = useCart();
     const navigate = useNavigate();
 
