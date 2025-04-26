@@ -6,7 +6,7 @@ require("dotenv").config();
 const razorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   const signature = req.headers["x-razorpay-signature"];
-  const body = Buffer.from(JSON.stringify(req.body));
+  const body = req.body;
 
   const expectedSignature = crypto
     .createHmac("sha256", secret)
@@ -17,8 +17,11 @@ const razorpayWebhook = async (req, res) => {
     return res.status(400).json({ error: "Invalid signature" });
   }
 
-  const event = req.body.event;
-  const payload = req.body.payload.payment.entity;
+  const data = JSON.parse(req.body);
+  const event = data.event;
+  const payload = data.payload.payment.entity;
+
+  console.log("payload", payload)
 
   if (event !== "payment.captured" && event !== "payment.failed") {
     return res.status(200).json({ status: "unhandled event" });
