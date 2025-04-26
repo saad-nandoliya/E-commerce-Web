@@ -33,11 +33,36 @@ const ProductsDetail = () => {
 
     if (!product) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                Loading...
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+                <div className="max-w-6xl w-full bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden animate-pulse">
+                    {/* Image Skeleton */}
+                    <div className="md:w-1/2 bg-gray-200 h-96"></div>
+    
+                    {/* Details Skeleton */}
+                    <div className="w-full md:w-1/2 p-6 space-y-4">
+                        <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+    
+                        <div className="mt-6 space-y-2">
+                            <div className="h-6 bg-gray-300 rounded w-1/3"></div>
+                            <div className="h-8 bg-gray-300 rounded w-1/4"></div>
+                        </div>
+    
+                        <div className="mt-6">
+                            <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                            <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        </div>
+    
+                        <div className="mt-6">
+                            <div className="h-10 bg-gray-300 rounded w-full"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
+    
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
