@@ -14,6 +14,7 @@ const getAllProducts = (req, res) => {
 
 const getProductsById = (req, res) => {
   const id = req.params.id;
+  console.log("id", req.params.id)
   const q = "SELECT * FROM products WHERE id =$1";
   db.query(q, [id], (err, result) => {
     if (err) {

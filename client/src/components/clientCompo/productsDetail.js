@@ -9,7 +9,9 @@ const API = process.env.REACT_APP_API_URL;
 
 const ProductsDetail = () => {
     const [product, setProduct] = useState(null);
+    console.log(product)
     const { id } = useParams();
+    console.log("Product ID from URL:", id)
     const { addToCart, cart } = useCart();
     const navigate = useNavigate();
 
@@ -25,19 +27,19 @@ const ProductsDetail = () => {
     const fetchProduct = async () => {
         try {
             const res = await axios.get(`${API}/getproductsbyid/${id}`);
-            setProduct(res.data[0] || null);
+            setProduct(res.data[0]);
         } catch (error) {
             console.error("Error fetching product:", error);
         }
     };
 
-    // if (!product) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center">
-    //             Loading...
-    //         </div>
-    //     );
-    // }
+    if (!product) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Loading...
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
