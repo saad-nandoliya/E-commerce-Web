@@ -1,15 +1,15 @@
 const crypto = require("crypto");
 const axios = require("axios");
-const fs = require("fs");
+// const fs = require("fs");
 const db = require("../../connection/connection");
 require("dotenv").config();
 
 // File logging for Render debugging
-const logStream = fs.createWriteStream("webhook.log", { flags: "a" });
-const logToFile = (message) => {
-  logStream.write(`${new Date().toISOString()} - ${message}\n`);
-  console.log(message);
-};
+// const logStream = fs.createWriteStream("webhook.log", { flags: "a" });
+// const console.log = (message) => {
+//   logStream.write(`${new Date().toISOString()} - ${message}\n`);
+//   console.log(message);
+// };
 
 // Retry logic for API calls
 const retry = async (fn, retries = 3, delay = 1000) => {
@@ -24,7 +24,7 @@ const retry = async (fn, retries = 3, delay = 1000) => {
 };
 
 const razorpayWebhook = async (req, res) => {
-  logToFile("Webhook received: " + JSON.stringify(req.body));
+  console.log("Webhook received: " + JSON.stringify(req.body));
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   const signature = req.headers["x-razorpay-signature"];
   const body = Buffer.from(JSON.stringify(req.body));
@@ -34,11 +34,11 @@ const razorpayWebhook = async (req, res) => {
     .update(body)
     .digest("hex");
 
-  logToFile("Received Signature: " + signature);
-  logToFile("Expected Signature: " + expectedSignature);
+  console.log("Received Signature: " + signature);
+  console.log("Expected Signature: " + expectedSignature);
 
   if (signature === expectedSignature) {
-    logToFile("✅ Webhook verified successfully");
+    console.log("✅ Webhook verified successfully");
     const event = req.body.event;
     const payload = req.body.payload.payment.entity;
 
@@ -56,7 +56,7 @@ const razorpayWebhook = async (req, res) => {
         const user_id = notes?.user_id ? parseInt(notes.user_id) : null;
 
         if (!order_id || !user_id) {
-          logToFile(
+          console.log(
             `Missing notes: order_id=${order_id}, user_id=${user_id} for payment_order_id: ${payment_order_id}`
           );
           return res.status(200).json({ status: "ok" });
@@ -68,7 +68,7 @@ const razorpayWebhook = async (req, res) => {
           [order_id]
         );
         if (!orderCheck.rows.length) {
-          logToFile("Order not found for order_id: " + order_id);
+          console.log("Order not found for order_id: " + order_id);
           return res.status(200).json({ status: "ok" });
         }
 
@@ -81,11 +81,11 @@ const razorpayWebhook = async (req, res) => {
             },
           })
         );
-        logToFile("Razorpay API Response: " + JSON.stringify(razorpayRes.data));
+        console.log("Razorpay API Response: " + JSON.stringify(razorpayRes.data));
 
         const payment = razorpayRes.data.items && razorpayRes.data.items[0];
         if (!payment) {
-          logToFile("No payment found for payment_order_id: " + payment_order_id);
+          console.log("No payment found for payment_order_id: " + payment_order_id);
           return res.status(200).json({ status: "ok" });
         }
 
@@ -98,7 +98,7 @@ const razorpayWebhook = async (req, res) => {
           "SELECT * FROM payments WHERE transaction_id = $1",
           [payment_id]
         );
-        logToFile("DB Check Result: " + JSON.stringify(check.rows));
+        console.log("DB Check Result: " + JSON.stringify(check.rows));
 
         if (check.rows.length === 0) {
           // Insert new payment record
@@ -119,11 +119,11 @@ const razorpayWebhook = async (req, res) => {
             status,
           ];
           await db.query(insertQuery, values);
-          logToFile("💾 Payment saved to DB");
-          logToFile("🧾 Status: " + status);
-          logToFile("💳 Method: " + payment_method);
-          logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + order_id);
+          console.log("💾 Payment saved to DB");
+          console.log("🧾 Status: " + status);
+          console.log("💳 Method: " + payment_method);
+          console.log("🆔 Payment ID: " + payment_id);
+          console.log("🆔 Payment Order ID: " + order_id);
         } else {
           // Update existing payment record
           const updateQuery = `
@@ -139,22 +139,22 @@ const razorpayWebhook = async (req, res) => {
             payment_id,
           ];
           await db.query(updateQuery, updateValues);
-          logToFile("🔄 Payment updated in DB");
-          logToFile("🧾 Status: " + status);
-          logToFile("💳 Method: " + payment_method);
-          logToFile("🆔 Payment ID: " + payment_id);
-          logToFile("🆔 Payment Order ID: " + order_id);
+          console.log("🔄 Payment updated in DB");
+          console.log("🧾 Status: " + status);
+          console.log("💳 Method: " + payment_method);
+          console.log("🆔 Payment ID: " + payment_id);
+          console.log("🆔 Payment Order ID: " + order_id);
         }
       } catch (err) {
-        logToFile("Webhook Error: " + err.message + "\nStack: " + err.stack);
+        console.log("Webhook Error: " + err.message + "\nStack: " + err.stack);
       }
     } else {
-      logToFile("ℹ️ Unhandled event: " + event);
+      console.log("ℹ️ Unhandled event: " + event);
     }
 
     return res.status(200).json({ status: "ok" });
   } else {
-    logToFile("❌ Webhook signature mismatch");
+    console.log("❌ Webhook signature mismatch");
     return res.status(400).json({ error: "Invalid signature" });
   }
 };
